@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Milinov Jewelry | Catálogo</title>
+  <meta name="description" content="Milinov Jewelry - joyas delicadas, elegantes y diseñadas para brillar contigo.">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="">
+  <div class="top-bar">
+    <div class="container">
+      <span>Envíos a todo el Perú</span>
+      <span>Empaque listo para regalar</span>
+    </div>
+  </div>
+
+  <header class="header desktop-header">
+    <div class="container header-inner">
+      <nav class="nav">
+        <a href="index.html">Inicio</a>
+        <a href="catalogo.html">Catálogo</a>
+        <a href="nosotros.html">Nosotros</a>
+        <a href="contacto.html">Contacto</a>
+      </nav>
+
+      <a class="logo" href="index.html">Milinov <span>Jewelry</span></a>
+
+      <div class="header-actions">
+        <input class="search-box" id="globalSearch" type="search" placeholder="Buscar joyas...">
+        <button class="icon-btn" type="button" aria-label="Favoritos">♡</button>
+        <button class="icon-btn" type="button" aria-label="Carrito" data-open-cart>🛍<span class="cart-count" data-cart-count>0</span></button>
+      </div>
+    </div>
+  </header>
+
+  <header class="header mobile-header">
+    <div class="container header-inner">
+      <button class="icon-btn" type="button" data-open-menu aria-label="Abrir menú">☰</button>
+      <a class="logo" href="index.html">Milinov <span>Jewelry</span></a>
+      <button class="icon-btn" type="button" data-open-cart aria-label="Carrito">🛍<span class="cart-count" data-cart-count>0</span></button>
+    </div>
+  </header>
+
+  <aside class="mobile-menu">
+    <div class="mobile-menu-head">
+      <a class="logo" href="index.html">Milinov <span>Jewelry</span></a>
+      <button class="close-btn" type="button" data-close-menu>×</button>
+    </div>
+    <nav>
+      <a href="index.html">Inicio</a>
+      <a href="catalogo.html">Catálogo</a>
+      <a href="nosotros.html">Nosotros</a>
+      <a href="contacto.html">Contacto</a>
+      <a href="https://wa.me/51999999999" target="_blank">WhatsApp</a>
+    </nav>
+  </aside>
+
+
+  <main>
+    <section class="page-hero">
+      <div class="container">
+        <span class="eyebrow">Catálogo</span>
+        <h1>Joyas para cada momento</h1>
+        <p>Busca, filtra y agrega tus piezas favoritas al carrito. Al finalizar, envía tu pedido por WhatsApp.</p>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top: 20px;">
+      <div class="container">
+        <div class="catalog-toolbar">
+          <input id="catalogSearch" data-filter="search" type="search" placeholder="Buscar por nombre, material o colección">
+          <select id="categoryFilter" data-filter="category">
+            <option value="all">Todas las categorías</option>
+            <option>Anillos</option>
+            <option>Collares</option>
+            <option>Aretes</option>
+            <option>Pulseras</option>
+            <option>Dijes</option>
+            <option>Sets</option>
+            <option>Hombre</option>
+            <option>Mujer</option>
+          </select>
+          <select id="collectionFilter" data-filter="collection">
+            <option value="all">Todas las colecciones</option>
+            <option>Silver</option>
+            <option>Golden</option>
+            <option>Rose</option>
+            <option>Gold18k</option>
+          </select>
+          <select id="sortFilter" data-filter="sort">
+            <option value="featured">Orden destacado</option>
+            <option value="price-asc">Precio menor a mayor</option>
+            <option value="price-desc">Precio mayor a menor</option>
+          </select>
+        </div>
+        <div class="catalog-meta" id="catalogCount">8 productos</div>
+        <div class="products-grid" id="catalogGrid"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div>
+        <h3 class="logo">Milinov <span>Jewelry</span></h3>
+        <p>Nadie es como tú y ese es tu poder. Joyas delicadas para elevar tu brillo diario.</p>
+      </div>
+      <div>
+        <h4>Tienda</h4>
+        <a href="catalogo.html">Catálogo</a>
+        <a href="catalogo.html?category=Anillos">Anillos</a>
+        <a href="catalogo.html?category=Collares">Collares</a>
+        <a href="catalogo.html?category=Aretes">Aretes</a>
+      </div>
+      <div>
+        <h4>Colecciones</h4>
+        <a href="catalogo.html?collection=Silver">Silver</a>
+        <a href="catalogo.html?collection=Golden">Golden</a>
+        <a href="catalogo.html?collection=Rose">Rose</a>
+        <a href="catalogo.html?collection=Gold18k">Gold18k</a>
+      </div>
+      <div>
+        <h4>Contacto</h4>
+        <a href="https://wa.me/51999999999" target="_blank">WhatsApp</a>
+        <a href="mailto:hola@milinovjewelry.com">hola@milinovjewelry.com</a>
+        <p>Lima, Perú</p>
+      </div>
+    </div>
+  </footer>
+
+  <div class="overlay"></div>
+
+  <aside class="cart-drawer">
+    <div class="cart-head">
+      <strong>Tu carrito</strong>
+      <button class="close-btn" type="button" data-close-cart>×</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-footer">
+      <div class="cart-footer-row">
+        <span>Total</span>
+        <strong id="cartTotal">S/ 0.00</strong>
+      </div>
+      <button class="btn btn-primary" id="checkoutWhatsapp" type="button">Enviar pedido por WhatsApp</button>
+      <a href="catalogo.html" class="btn btn-outline">Seguir comprando</a>
+    </div>
+  </aside>
+
+  <nav class="bottom-nav">
+    <a href="index.html">⌂<span>Inicio</span></a>
+    <a href="catalogo.html">◌<span>Categorías</span></a>
+    <a href="#">♡<span>Favoritos</span></a>
+    <button type="button" data-open-cart>🛍<span>Carrito</span></button>
+    <a href="https://wa.me/51999999999" target="_blank">☘<span>WhatsApp</span></a>
+  </nav>
+
+  <script src="js/products.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Milinov Jewelry | Nosotros</title>
+  <meta name="description" content="Milinov Jewelry - joyas delicadas, elegantes y diseñadas para brillar contigo.">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="">
+  <div class="top-bar">
+    <div class="container">
+      <span>Envíos a todo el Perú</span>
+      <span>Empaque listo para regalar</span>
+    </div>
+  </div>
+
+  <header class="header desktop-header">
+    <div class="container header-inner">
+      <nav class="nav">
+        <a href="index.html">Inicio</a>
+        <a href="catalogo.html">Catálogo</a>
+        <a href="nosotros.html">Nosotros</a>
+        <a href="contacto.html">Contacto</a>
+      </nav>
+
+      <a class="logo" href="index.html">Milinov <span>Jewelry</span></a>
+
+      <div class="header-actions">
+        <input class="search-box" id="globalSearch" type="search" placeholder="Buscar joyas...">
+        <button class="icon-btn" type="button" aria-label="Favoritos">♡</button>
+        <button class="icon-btn" type="button" aria-label="Carrito" data-open-cart>🛍<span class="cart-count" data-cart-count>0</span></button>
+      </div>
+    </div>
+  </header>
+
+  <header class="header mobile-header">
+    <div class="container header-inner">
+      <button class="icon-btn" type="button" data-open-menu aria-label="Abrir menú">☰</button>
+      <a class="logo" href="index.html">Milinov <span>Jewelry</span></a>
+      <button class="icon-btn" type="button" data-open-cart aria-label="Carrito">🛍<span class="cart-count" data-cart-count>0</span></button>
+    </div>
+  </header>
+
+  <aside class="mobile-menu">
+    <div class="mobile-menu-head">
+      <a class="logo" href="index.html">Milinov <span>Jewelry</span></a>
+      <button class="close-btn" type="button" data-close-menu>×</button>
+    </div>
+    <nav>
+      <a href="index.html">Inicio</a>
+      <a href="catalogo.html">Catálogo</a>
+      <a href="nosotros.html">Nosotros</a>
+      <a href="contacto.html">Contacto</a>
+      <a href="https://wa.me/51999999999" target="_blank">WhatsApp</a>
+    </nav>
+  </aside>
+
+
+  <main>
+    <section class="page-hero">
+      <div class="container">
+        <span class="eyebrow">Nosotros</span>
+        <h1>Nadie es como tú y ese es tu poder</h1>
+        <p>Milinov Jewelry nace para acompañar tu estilo con piezas femeninas, elegantes y delicadas.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container about-grid">
+        <div class="about-card">
+          <span class="eyebrow">Nuestra esencia</span>
+          <h2>Joyas que cuentan una historia sutil</h2>
+          <p>Creemos que una joya no necesita gritar para destacar. En Milinov elegimos piezas con acabados finos, formas delicadas y brillo equilibrado para acompañarte en tu día a día.</p>
+          <p>Nuestro objetivo es que cada compra se sienta especial: desde la elección de la pieza hasta el empaque listo para regalar.</p>
+          <a href="catalogo.html" class="btn btn-primary">Conocer catálogo</a>
+        </div>
+        <img class="about-image" src="assets/banners/nosotros.jpg" alt="Milinov Jewelry boutique" onerror="this.src='https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1100&q=85'">
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container benefits">
+        <article class="benefit"><strong>Elegancia diaria</strong><p>Piezas versátiles para looks casuales, formales y especiales.</p></article>
+        <article class="benefit"><strong>Detalle premium</strong><p>Diseño limpio, empaque cuidado y atención cercana.</p></article>
+        <article class="benefit"><strong>Regalos con intención</strong><p>Opciones ideales para fechas importantes.</p></article>
+        <article class="benefit"><strong>Compra asistida</strong><p>Te acompañamos por WhatsApp para coordinar tu pedido.</p></article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div>
+        <h3 class="logo">Milinov <span>Jewelry</span></h3>
+        <p>Nadie es como tú y ese es tu poder. Joyas delicadas para elevar tu brillo diario.</p>
+      </div>
+      <div>
+        <h4>Tienda</h4>
+        <a href="catalogo.html">Catálogo</a>
+        <a href="catalogo.html?category=Anillos">Anillos</a>
+        <a href="catalogo.html?category=Collares">Collares</a>
+        <a href="catalogo.html?category=Aretes">Aretes</a>
+      </div>
+      <div>
+        <h4>Colecciones</h4>
+        <a href="catalogo.html?collection=Silver">Silver</a>
+        <a href="catalogo.html?collection=Golden">Golden</a>
+        <a href="catalogo.html?collection=Rose">Rose</a>
+        <a href="catalogo.html?collection=Gold18k">Gold18k</a>
+      </div>
+      <div>
+        <h4>Contacto</h4>
+        <a href="https://wa.me/51999999999" target="_blank">WhatsApp</a>
+        <a href="mailto:hola@milinovjewelry.com">hola@milinovjewelry.com</a>
+        <p>Lima, Perú</p>
+      </div>
+    </div>
+  </footer>
+
+  <div class="overlay"></div>
+
+  <aside class="cart-drawer">
+    <div class="cart-head">
+      <strong>Tu carrito</strong>
+      <button class="close-btn" type="button" data-close-cart>×</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-footer">
+      <div class="cart-footer-row">
+        <span>Total</span>
+        <strong id="cartTotal">S/ 0.00</strong>
+      </div>
+      <button class="btn btn-primary" id="checkoutWhatsapp" type="button">Enviar pedido por WhatsApp</button>
+      <a href="catalogo.html" class="btn btn-outline">Seguir comprando</a>
+    </div>
+  </aside>
+
+  <nav class="bottom-nav">
+    <a href="index.html">⌂<span>Inicio</span></a>
+    <a href="catalogo.html">◌<span>Categorías</span></a>
+    <a href="#">♡<span>Favoritos</span></a>
+    <button type="button" data-open-cart>🛍<span>Carrito</span></button>
+    <a href="https://wa.me/51999999999" target="_blank">☘<span>WhatsApp</span></a>
+  </nav>
+
+  <script src="js/products.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
