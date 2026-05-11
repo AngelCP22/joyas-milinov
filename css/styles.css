@@ -1722,17 +1722,21 @@ h1, h2, h3 {
   }
 
   .story-grid {
-    grid-template-columns: repeat(4, minmax(112px, 1fr));
-    overflow-x: auto;
-    padding-bottom: 8px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
   }
 
   .story-item {
-    font-size: 14px;
+    font-size: 11px;
   }
 
   .story-item img {
-    width: 96px;
+    width: 74px;
+  }
+
+  .story-item svg {
+    width: 25px;
+    height: 25px;
   }
 
   .featured-stories .section-title {
