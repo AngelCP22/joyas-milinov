@@ -11,13 +11,13 @@ const PRODUCTS = [
   },
   {
     id: 2,
-    name: "Collar Estrella de Mar",
+    name: "Collar Dije Corazón",
     category: "Collares",
     collection: "Silver",
     material: "Plata 950",
     price: 139,
-    image: "assets/products/collar-estrella-mar.jpg",
-    description: "Collar delicado con dije de estrella de mar."
+    image: "assets/products/collar-dije-corazon.jpg",
+    description: "Collar delicado con dije de corazón para uso diario."
   },
   {
     id: 3,
@@ -41,43 +41,63 @@ const PRODUCTS = [
   },
   {
     id: 5,
-    name: "Pulsera Corazones",
-    category: "Pulseras",
+    name: "Collar Placa Love",
+    category: "Collares",
     collection: "Silver",
     material: "Plata 950",
     price: 159,
-    image: "assets/products/pulsera-corazones.jpg",
-    description: "Pulsera fina con dijes de corazón."
+    image: "assets/products/collar-placa-love.jpg",
+    description: "Collar fino con placa delicada de amor."
   },
   {
     id: 6,
-    name: "Anillo Solitario",
-    category: "Anillos",
+    name: "Collar Mini Corazón",
+    category: "Collares",
     collection: "Golden",
     material: "Baño de oro",
     price: 149,
-    image: "assets/products/anillo-solitario.jpg",
-    description: "Anillo clásico y elegante para ocasiones especiales."
+    image: "assets/products/collar-corazon-diario.jpg",
+    description: "Collar clásico y elegante para ocasiones especiales."
   },
   {
     id: 7,
-    name: "Aretes Flor Rosa",
+    name: "Aretes Corazón",
     category: "Aretes",
     collection: "Rose",
     material: "Baño Rose",
     price: 69,
-    image: "assets/products/aretes-flor-rosa.jpg",
-    description: "Aretes pequeños con diseño floral."
+    image: "assets/products/aretes-corazon.jpg",
+    description: "Aretes pequeños con diseño de corazón."
   },
   {
     id: 8,
-    name: "Collar Mini Corazón",
+    name: "Collar Niña Corazón",
     category: "Collares",
     collection: "Gold18k",
     material: "Oro 18k",
     price: 189,
-    image: "assets/products/collar-mini-corazon.jpg",
-    description: "Collar fino con dije de corazón en acabado premium."
+    image: "assets/products/collar-nina-corazon.jpg",
+    description: "Collar fino con dije especial en acabado premium."
+  },
+  {
+    id: 9,
+    name: "Collar Osito",
+    category: "Collares",
+    collection: "Golden",
+    material: "Baño de oro",
+    price: 129,
+    image: "assets/products/collar-osito.jpg",
+    description: "Dije tierno y delicado para regalar."
+  },
+  {
+    id: 10,
+    name: "Pulsera Infinito",
+    category: "Pulseras",
+    collection: "Silver",
+    material: "Plata 950",
+    price: 109,
+    image: "assets/products/pulsera-infinito.jpg",
+    description: "Pulsera ligera con detalle infinito."
   }
 ];
 

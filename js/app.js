@@ -19,7 +19,6 @@ function productCard(product) {
     <article class="product-card">
       <a class="product-image" href="producto.html?id=${product.id}">
         <img src="${product.image}" alt="${product.name}" onerror="productImageFallback(event)">
-        <button class="favorite-btn" type="button" aria-label="Agregar a favoritos">♡</button>
       </a>
       <div class="product-info">
         <span>${product.collection} · ${product.material}</span>
@@ -45,7 +44,7 @@ function renderProducts(target, products) {
 }
 
 function renderFeatured() {
-  renderProducts("#featuredGrid", PRODUCTS.slice(0, 8));
+  renderProducts("#featuredGrid", PRODUCTS.slice(0, 4));
 }
 
 function renderCategoryPills() {
@@ -288,5 +287,9 @@ document.addEventListener("DOMContentLoaded", () => {
     catalogSearch.value = params.get("search");
     catalogState.search = params.get("search");
     applyCatalogFilters();
+  }
+
+  if (window.lucide) {
+    window.lucide.createIcons();
   }
 });
