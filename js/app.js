@@ -43,8 +43,65 @@ function renderProducts(target, products) {
   node.innerHTML = products.map(productCard).join("");
 }
 
+const featuredSlider = {
+  page: 0,
+  timer: null
+};
+
 function renderFeatured() {
-  renderProducts("#featuredGrid", PRODUCTS.slice(0, 4));
+  renderProducts("#featuredGrid", PRODUCTS);
+}
+
+function initFeaturedSlider() {
+  const grid = qs("#featuredGrid");
+  const dots = qs("#featuredDots");
+  if (!grid || !dots) return;
+
+  const cards = qsa("#featuredGrid .product-card");
+  const pageSize = 4;
+  const pages = Math.ceil(cards.length / pageSize);
+
+  if (pages <= 1) {
+    dots.innerHTML = "";
+    cards.forEach(card => card.classList.remove("is-slider-hidden"));
+    return;
+  }
+
+  dots.innerHTML = Array.from({ length: pages }, (_, index) => `
+    <button type="button" aria-label="Ver grupo ${index + 1}" data-featured-page="${index}"></button>
+  `).join("");
+
+  function showPage(page) {
+    featuredSlider.page = (page + pages) % pages;
+    const start = featuredSlider.page * pageSize;
+    const end = start + pageSize;
+
+    cards.forEach((card, index) => {
+      card.classList.toggle("is-slider-hidden", index < start || index >= end);
+    });
+
+    qsa("[data-featured-page]").forEach((button, index) => {
+      button.classList.toggle("is-active", index === featuredSlider.page);
+      button.setAttribute("aria-current", index === featuredSlider.page ? "true" : "false");
+    });
+  }
+
+  qsa("[data-featured-page]").forEach(button => {
+    button.addEventListener("click", () => {
+      showPage(Number(button.dataset.featuredPage));
+      restartFeaturedSlider();
+    });
+  });
+
+  function restartFeaturedSlider() {
+    window.clearInterval(featuredSlider.timer);
+    featuredSlider.timer = window.setInterval(() => {
+      showPage(featuredSlider.page + 1);
+    }, 5200);
+  }
+
+  showPage(featuredSlider.page);
+  restartFeaturedSlider();
 }
 
 function renderCategoryPills() {
@@ -273,6 +330,7 @@ function initContactForm() {
 
 document.addEventListener("DOMContentLoaded", () => {
   renderFeatured();
+  initFeaturedSlider();
   renderCategoryPills();
   renderCollections();
   initCatalog();

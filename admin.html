@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Milinov Jewelry | Admin</title>
+  <meta name="description" content="Panel local para administrar productos de Milinov Jewelry.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="admin-page">
+  <main class="admin-shell">
+    <section class="admin-hero">
+      <a class="logo" href="index.html">Milinov <span>Jewelry</span></a>
+      <div>
+        <span class="eyebrow">Backend local</span>
+        <h1>Inventario y precios</h1>
+        <p>Agrega nuevas joyas, cambia precios, unidades disponibles, categorías y modelos.</p>
+      </div>
+      <a class="btn btn-outline" href="tienda.html">Ver tienda</a>
+    </section>
+
+    <section class="admin-grid">
+      <form class="admin-card admin-form" id="productForm">
+        <input type="hidden" name="id">
+        <h2>Producto</h2>
+        <label>SKU<input name="sku" required placeholder="MIL-COL-011"></label>
+        <label>Nombre<input name="name" required placeholder="Collar Luna"></label>
+        <label>Categoría<input name="category" required placeholder="Collares"></label>
+        <label>Colección<input name="collection" placeholder="Silver"></label>
+        <label>Modelo<input name="model" required placeholder="Luna"></label>
+        <label>Material<input name="material" placeholder="Plata 950"></label>
+        <div class="admin-form-row">
+          <label>Precio<input name="price" required type="number" min="0" step="0.01"></label>
+          <label>Stock<input name="stock" required type="number" min="0" step="1"></label>
+        </div>
+        <label>Estado
+          <select name="status">
+            <option value="active">Activo</option>
+            <option value="draft">Borrador</option>
+            <option value="sold_out">Agotado</option>
+          </select>
+        </label>
+        <label>Imagen<input name="image" placeholder="assets/products/collar-luna.jpg"></label>
+        <label>Descripción<textarea name="description" placeholder="Descripción breve para catálogo"></textarea></label>
+        <div class="admin-actions">
+          <button class="btn btn-primary" type="submit">Guardar</button>
+          <button class="btn btn-outline" type="button" id="clearForm">Limpiar</button>
+        </div>
+      </form>
+
+      <section class="admin-card admin-list">
+        <div class="admin-list-head">
+          <div>
+            <h2>Joyas</h2>
+            <p id="adminStatus">Conectando con API...</p>
+          </div>
+          <button class="btn btn-outline" type="button" id="reloadProducts">Actualizar</button>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Categoría</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="adminProducts"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script src="js/admin.js"></script>
+</body>
+</html>
