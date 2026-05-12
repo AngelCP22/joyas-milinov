@@ -303,6 +303,7 @@ function initUI() {
 }
 
 function openMobileMenu() {
+  if (!window.matchMedia("(max-width: 980px)").matches) return;
   qs(".mobile-menu")?.classList.add("is-open");
   qs(".overlay")?.classList.add("is-open");
   document.body.classList.add("no-scroll");
