@@ -4,6 +4,7 @@ const path = require("path");
 
 const PORT = Number(process.env.PORT || 3001);
 const DATA_FILE = path.join(__dirname, "data", "products.json");
+const UPLOAD_DIR = path.join(__dirname, "..", "assets", "uploads");
 
 async function readProducts() {
   const raw = await fs.readFile(DATA_FILE, "utf8");
@@ -46,6 +47,38 @@ function parseBody(req) {
       }
     });
   });
+}
+
+function safeFilename(name) {
+  const ext = path.extname(name).toLowerCase().replace(/[^.\w]/g, "") || ".jpg";
+  const base = path.basename(name, ext).toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 48) || "joya";
+  return `${base}-${Date.now()}${ext}`;
+}
+
+async function saveUpload(input) {
+  if (!input?.dataUrl || !input?.filename) {
+    throw new Error("Imagen requerida");
+  }
+
+  const match = input.dataUrl.match(/^data:(image\/(?:png|jpeg|jpg|webp));base64,(.+)$/);
+  if (!match) {
+    throw new Error("Formato de imagen no permitido. Usa JPG, PNG o WEBP.");
+  }
+
+  const bytes = Buffer.from(match[2], "base64");
+  if (bytes.length > 5 * 1024 * 1024) {
+    throw new Error("La imagen no debe superar 5 MB");
+  }
+
+  await fs.mkdir(UPLOAD_DIR, { recursive: true });
+  const filename = safeFilename(input.filename);
+  await fs.writeFile(path.join(UPLOAD_DIR, filename), bytes);
+  return `assets/uploads/${filename}`;
 }
 
 function normalizeProduct(input, fallback = {}) {
@@ -117,6 +150,13 @@ const server = http.createServer(async (req, res) => {
       const products = await readProducts();
       const categories = [...new Set(products.map(product => product.category).filter(Boolean))].sort();
       send(res, 200, categories);
+      return;
+    }
+
+    if (req.method === "POST" && url.pathname === "/api/uploads") {
+      const input = await parseBody(req);
+      const image = await saveUpload(input);
+      send(res, 201, { image });
       return;
     }
 

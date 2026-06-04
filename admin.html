@@ -41,7 +41,14 @@
             <option value="sold_out">Agotado</option>
           </select>
         </label>
-        <label>Imagen<input name="image" placeholder="assets/products/collar-luna.jpg"></label>
+        <label>Imagen
+          <input name="imageFile" id="imageFile" type="file" accept="image/png,image/jpeg,image/webp">
+        </label>
+        <div class="admin-image-preview">
+          <img id="imagePreview" src="assets/banners/empaque-regalo.jpg" alt="Vista previa de la joya">
+          <input name="image" id="imagePath" placeholder="assets/products/collar-luna.jpg">
+          <small>También puedes pegar una ruta existente si ya tienes la imagen subida.</small>
+        </div>
         <label>Descripción<textarea name="description" placeholder="Descripción breve para catálogo"></textarea></label>
         <div class="admin-actions">
           <button class="btn btn-primary" type="submit">Guardar</button>
@@ -55,7 +62,10 @@
             <h2>Joyas</h2>
             <p id="adminStatus">Conectando con API...</p>
           </div>
-          <button class="btn btn-outline" type="button" id="reloadProducts">Actualizar</button>
+          <div class="admin-actions compact">
+            <a class="btn btn-outline" href="catalogo.html">Ver catálogo</a>
+            <button class="btn btn-outline" type="button" id="reloadProducts">Actualizar</button>
+          </div>
         </div>
         <div class="admin-table-wrap">
           <table class="admin-table">
@@ -65,6 +75,7 @@
                 <th>Categoría</th>
                 <th>Precio</th>
                 <th>Stock</th>
+                <th>Estado</th>
                 <th></th>
               </tr>
             </thead>

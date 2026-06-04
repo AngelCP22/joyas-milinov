@@ -43,6 +43,18 @@ function renderProducts(target, products) {
   node.innerHTML = products.map(productCard).join("");
 }
 
+async function hydrateProductsFromApi() {
+  try {
+    const response = await fetch("http://localhost:3001/api/products?status=active");
+    if (!response.ok) return;
+    const apiProducts = await response.json();
+    if (!Array.isArray(apiProducts) || !apiProducts.length) return;
+    PRODUCTS.splice(0, PRODUCTS.length, ...apiProducts);
+  } catch {
+    // Si el backend no está encendido, el sitio usa los productos estáticos.
+  }
+}
+
 const featuredSlider = {
   page: 0,
   timer: null
@@ -329,7 +341,8 @@ function initContactForm() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  await hydrateProductsFromApi();
   renderFeatured();
   initFeaturedSlider();
   renderCategoryPills();

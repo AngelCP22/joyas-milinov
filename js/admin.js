@@ -3,6 +3,9 @@ const API_URL = "http://localhost:3001/api";
 const form = document.querySelector("#productForm");
 const tableBody = document.querySelector("#adminProducts");
 const statusNode = document.querySelector("#adminStatus");
+const imageFile = document.querySelector("#imageFile");
+const imagePath = document.querySelector("#imagePath");
+const imagePreview = document.querySelector("#imagePreview");
 let products = [];
 
 function moneyAdmin(value) {
@@ -21,6 +24,35 @@ async function request(path, options = {}) {
 
 function setStatus(message) {
   statusNode.textContent = message;
+}
+
+function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error("No se pudo leer la imagen"));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadSelectedImage() {
+  const file = imageFile.files?.[0];
+  if (!file) return imagePath.value.trim();
+
+  setStatus("Subiendo imagen...");
+  const dataUrl = await fileToDataUrl(file);
+  const result = await request("/uploads", {
+    method: "POST",
+    body: JSON.stringify({
+      filename: file.name,
+      dataUrl
+    })
+  });
+
+  imagePath.value = result.image;
+  imagePreview.src = result.image;
+  imageFile.value = "";
+  return result.image;
 }
 
 function productFromForm() {
@@ -44,12 +76,14 @@ function fillForm(product) {
   Object.entries(product).forEach(([key, value]) => {
     if (form.elements[key]) form.elements[key].value = value ?? "";
   });
+  imagePreview.src = product.image || "assets/banners/empaque-regalo.jpg";
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function clearForm() {
   form.reset();
   form.elements.id.value = "";
+  imagePreview.src = "assets/banners/empaque-regalo.jpg";
 }
 
 function renderProducts() {
@@ -62,6 +96,7 @@ function renderProducts() {
       <td>${product.category}</td>
       <td>${moneyAdmin(product.price)}</td>
       <td><span class="stock-pill ${product.stock <= 2 ? "is-low" : ""}">${product.stock}</span></td>
+      <td><span class="status-pill ${product.status}">${product.status}</span></td>
       <td>
         <button type="button" data-edit="${product.id}">Editar</button>
         <button type="button" data-delete="${product.id}">Eliminar</button>
@@ -76,16 +111,19 @@ async function loadProducts() {
     renderProducts();
     setStatus(`${products.length} productos cargados`);
   } catch (error) {
-    setStatus(`No se pudo conectar. Ejecuta: cd backend && npm start`);
+    setStatus("No se pudo conectar. Ejecuta: cd backend && npm start");
   }
 }
 
 form.addEventListener("submit", async event => {
   event.preventDefault();
   const id = form.elements.id.value;
-  const product = productFromForm();
 
   try {
+    const uploadedImage = await uploadSelectedImage();
+    const product = productFromForm();
+    product.image = uploadedImage;
+
     if (id) {
       await request(`/products/${id}`, {
         method: "PATCH",
@@ -124,6 +162,16 @@ tableBody.addEventListener("click", async event => {
       setStatus(error.message);
     }
   }
+});
+
+imageFile.addEventListener("change", async () => {
+  const file = imageFile.files?.[0];
+  if (!file) return;
+  imagePreview.src = await fileToDataUrl(file);
+});
+
+imagePath.addEventListener("input", () => {
+  if (imagePath.value.trim()) imagePreview.src = imagePath.value.trim();
 });
 
 document.querySelector("#clearForm").addEventListener("click", clearForm);

@@ -22,6 +22,7 @@ La API queda en `http://localhost:3001`.
 - `PATCH /api/products/:id`
 - `DELETE /api/products/:id`
 - `GET /api/categories`
+- `POST /api/uploads`
 
 ## Ejemplo para crear una joya
 
@@ -31,4 +32,4 @@ curl -X POST http://localhost:3001/api/products ^
   -d "{\"sku\":\"MIL-COL-011\",\"name\":\"Collar Luna\",\"category\":\"Collares\",\"collection\":\"Silver\",\"model\":\"Luna\",\"material\":\"Plata 950\",\"price\":129,\"stock\":5,\"image\":\"assets/products/collar-luna.jpg\",\"description\":\"Collar delicado con dije de luna.\"}"
 ```
 
-Por ahora guarda los datos en `backend/data/products.json`. El siguiente paso natural es conectar esta API al catálogo y luego agregar un panel admin para editar productos sin tocar JSON.
+Por ahora guarda los datos en `backend/data/products.json`. Las imágenes subidas desde `admin.html` se guardan en `assets/uploads/`.

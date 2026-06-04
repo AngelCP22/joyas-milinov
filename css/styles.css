@@ -2266,11 +2266,38 @@ h1, h2, h3 {
   resize: vertical;
 }
 
+.admin-image-preview {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  background: #fffaf5;
+}
+
+.admin-image-preview img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 14px;
+  background: var(--color-ivory);
+}
+
+.admin-image-preview small {
+  color: var(--color-muted);
+  line-height: 1.4;
+}
+
 .admin-form-row,
 .admin-actions,
 .admin-list-head {
   display: flex;
   gap: 12px;
+}
+
+.admin-actions.compact {
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .admin-form-row > * {
@@ -2333,6 +2360,27 @@ h1, h2, h3 {
 }
 
 .stock-pill.is-low {
+  background: #fff1e8;
+  color: #ad532a;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: #f4efe7;
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.status-pill.active {
+  background: #edf7ee;
+  color: #1f7a35;
+}
+
+.status-pill.sold_out {
   background: #fff1e8;
   color: #ad532a;
 }
