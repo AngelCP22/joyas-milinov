@@ -26,10 +26,23 @@
         <h2>Producto</h2>
         <label>SKU<input name="sku" required placeholder="MIL-COL-011"></label>
         <label>Nombre<input name="name" required placeholder="Collar Luna"></label>
-        <label>Categoría<input name="category" required placeholder="Collares"></label>
+        <label>Categoría
+          <select name="category" required>
+            <option>Collares</option>
+            <option>Pulseras</option>
+            <option>Anillos</option>
+            <option>Dijes</option>
+            <option>Aretes</option>
+          </select>
+        </label>
         <label>Colección<input name="collection" placeholder="Silver"></label>
         <label>Modelo<input name="model" required placeholder="Luna"></label>
-        <label>Material<input name="material" placeholder="Plata 950"></label>
+        <label>Material
+          <select name="material">
+            <option>Plata 950</option>
+            <option>Cobre + enchape oro 18k</option>
+          </select>
+        </label>
         <div class="admin-form-row">
           <label>Precio<input name="price" required type="number" min="0" step="0.01"></label>
           <label>Stock<input name="stock" required type="number" min="0" step="1"></label>

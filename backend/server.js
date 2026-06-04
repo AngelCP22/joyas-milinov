@@ -7,7 +7,7 @@ const DATA_FILE = path.join(__dirname, "data", "products.json");
 const UPLOAD_DIR = path.join(__dirname, "..", "assets", "uploads");
 
 async function readProducts() {
-  const raw = await fs.readFile(DATA_FILE, "utf8");
+  const raw = (await fs.readFile(DATA_FILE, "utf8")).replace(/^\uFEFF/, "");
   return JSON.parse(raw);
 }
 

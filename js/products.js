@@ -1,4 +1,4 @@
-const PRODUCTS = [
+﻿const PRODUCTS = [
   {
     id: 1,
     name: "Anillo Brillo Eterno",
@@ -24,7 +24,7 @@ const PRODUCTS = [
     name: "Aretes Dulce Luz",
     category: "Aretes",
     collection: "Rose",
-    material: "Baño Rose",
+    material: "Cobre + enchape oro 18k",
     price: 99,
     image: "assets/products/aretes-dulce-luz.jpg",
     description: "Aretes delicados con brillo rosado."
@@ -34,7 +34,7 @@ const PRODUCTS = [
     name: "Collar Mini Amor",
     category: "Collares",
     collection: "Golden",
-    material: "Baño de oro",
+    material: "Cobre + enchape oro 18k",
     price: 149,
     image: "assets/products/collar-mini-amor.jpg",
     description: "Collar con dije delicado y corazón."
@@ -42,7 +42,7 @@ const PRODUCTS = [
   {
     id: 5,
     name: "Collar Placa Love",
-    category: "Collares",
+    category: "Dijes",
     collection: "Silver",
     material: "Plata 950",
     price: 159,
@@ -54,7 +54,7 @@ const PRODUCTS = [
     name: "Collar Mini Corazón",
     category: "Collares",
     collection: "Golden",
-    material: "Baño de oro",
+    material: "Cobre + enchape oro 18k",
     price: 149,
     image: "assets/products/collar-corazon-diario.jpg",
     description: "Collar clásico y elegante para ocasiones especiales."
@@ -64,7 +64,7 @@ const PRODUCTS = [
     name: "Aretes Corazón",
     category: "Aretes",
     collection: "Rose",
-    material: "Baño Rose",
+    material: "Cobre + enchape oro 18k",
     price: 69,
     image: "assets/products/aretes-corazon.jpg",
     description: "Aretes pequeños con diseño de corazón."
@@ -74,7 +74,7 @@ const PRODUCTS = [
     name: "Collar Niña Corazón",
     category: "Collares",
     collection: "Gold18k",
-    material: "Oro 18k",
+    material: "Cobre + enchape oro 18k",
     price: 189,
     image: "assets/products/collar-nina-corazon.jpg",
     description: "Collar fino con dije especial en acabado premium."
@@ -82,9 +82,9 @@ const PRODUCTS = [
   {
     id: 9,
     name: "Collar Osito",
-    category: "Collares",
+    category: "Dijes",
     collection: "Golden",
-    material: "Baño de oro",
+    material: "Cobre + enchape oro 18k",
     price: 129,
     image: "assets/products/collar-osito.jpg",
     description: "Dije tierno y delicado para regalar."

@@ -150,6 +150,7 @@ function renderCollections() {
 let catalogState = {
   search: "",
   category: "all",
+  material: "all",
   collection: "all",
   sort: "featured"
 };
@@ -160,12 +161,15 @@ function initCatalog() {
 
   const params = new URLSearchParams(window.location.search);
   catalogState.category = params.get("category") || "all";
+  catalogState.material = params.get("material") || "all";
   catalogState.collection = params.get("collection") || "all";
 
   const categorySelect = qs("#categoryFilter");
+  const materialSelect = qs("#materialFilter");
   const collectionSelect = qs("#collectionFilter");
 
   if (categorySelect) categorySelect.value = catalogState.category;
+  if (materialSelect) materialSelect.value = catalogState.material;
   if (collectionSelect) collectionSelect.value = catalogState.collection;
 
   qsa("[data-filter]").forEach(input => {
@@ -197,6 +201,10 @@ function applyCatalogFilters() {
 
   if (catalogState.category !== "all") {
     filtered = filtered.filter(product => product.category === catalogState.category);
+  }
+
+  if (catalogState.material !== "all") {
+    filtered = filtered.filter(product => product.material === catalogState.material);
   }
 
   if (catalogState.collection !== "all") {
@@ -315,14 +323,21 @@ function initUI() {
 }
 
 function openMobileMenu() {
-  if (!window.matchMedia("(max-width: 980px)").matches) return;
-  qs(".mobile-menu")?.classList.add("is-open");
+  const menu = qs(".mobile-menu");
+  if (menu) {
+    menu.classList.add("is-open");
+    menu.style.transform = "translateX(0)";
+  }
   qs(".overlay")?.classList.add("is-open");
   document.body.classList.add("no-scroll");
 }
 
 function closeMobileMenu() {
-  qs(".mobile-menu")?.classList.remove("is-open");
+  const menu = qs(".mobile-menu");
+  if (menu) {
+    menu.classList.remove("is-open");
+    menu.style.transform = "translateX(-100%)";
+  }
   qs(".overlay")?.classList.remove("is-open");
   document.body.classList.remove("no-scroll");
 }

@@ -598,7 +598,7 @@ h1, h2, h3 {
 
 .catalog-toolbar {
   display: grid;
-  grid-template-columns: 1.5fr repeat(3, 1fr);
+  grid-template-columns: minmax(220px, 1.35fr) repeat(4, minmax(150px, 1fr));
   gap: 12px;
   background: var(--color-white);
   border: 1px solid var(--color-border);
@@ -1425,6 +1425,102 @@ h1, h2, h3 {
   stroke-width: 1.45;
 }
 
+.material-sections {
+  padding: 44px 0 34px;
+  border-bottom: 1px solid #e8cfad;
+  background: rgba(255, 255, 255, .58);
+}
+
+.material-title {
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.material-title h2 {
+  margin: 6px 0 0;
+  color: #4c433e;
+  font-size: clamp(30px, 4vw, 44px);
+}
+
+.material-group {
+  border: 1px solid #ead5bd;
+  border-radius: 14px;
+  padding: 22px;
+  background: linear-gradient(135deg, rgba(255,255,255,.92), rgba(255,248,241,.84));
+  margin-top: 18px;
+}
+
+.material-group.warm {
+  background: linear-gradient(135deg, rgba(255,250,243,.94), rgba(246,226,207,.72));
+}
+
+.material-group-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: end;
+  margin-bottom: 16px;
+}
+
+.material-group-head span {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(28px, 4vw, 40px);
+  color: #51453e;
+}
+
+.material-group-head p {
+  max-width: 460px;
+  margin: 0;
+  color: #6c5f57;
+  line-height: 1.5;
+}
+
+.material-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+}
+
+.material-grid a {
+  min-height: 188px;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  display: grid;
+  align-items: end;
+  isolation: isolate;
+  color: #fff;
+  box-shadow: 0 14px 28px rgba(82,64,47,.1);
+}
+
+.material-grid img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+  transition: transform .25s ease;
+}
+
+.material-grid a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, transparent 32%, rgba(44,34,28,.68));
+}
+
+.material-grid a:hover img {
+  transform: scale(1.05);
+}
+
+.material-grid span {
+  padding: 14px;
+  font-weight: 800;
+  text-shadow: 0 2px 10px rgba(0,0,0,.35);
+}
+
 .featured-stories {
   padding: 30px 0 26px;
 }
@@ -1690,6 +1786,10 @@ h1, h2, h3 {
     gap: 20px;
   }
 
+  .material-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
   .home-page .products-grid {
     grid-template-columns: repeat(4, 1fr);
     gap: 14px;
@@ -1792,6 +1892,36 @@ h1, h2, h3 {
   .story-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 10px;
+  }
+
+  .material-sections {
+    padding: 28px 0;
+  }
+
+  .material-title {
+    display: flex;
+  }
+
+  .material-group {
+    padding: 14px;
+  }
+
+  .material-group-head {
+    display: block;
+  }
+
+  .material-group-head p {
+    margin-top: 6px;
+    font-size: 13px;
+  }
+
+  .material-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .material-grid a {
+    min-height: 126px;
   }
 
   .story-item {
@@ -2057,6 +2187,82 @@ h1, h2, h3 {
 
 .brand-icon.tiktok {
   background: #111;
+}
+
+.linktree-shop-sections {
+  display: grid;
+  gap: 18px;
+  padding: 0 32px 32px;
+  position: relative;
+  z-index: 2;
+}
+
+.linktree-section-head {
+  text-align: left;
+}
+
+.linktree-section-head h2 {
+  margin: 4px 0 0;
+  font-family: "Playfair Display", serif;
+  font-size: 28px;
+  color: #302925;
+}
+
+.linktree-material {
+  display: grid;
+  gap: 10px;
+}
+
+.linktree-material h3 {
+  margin: 0;
+  color: #7c6046;
+  font-size: 15px;
+}
+
+.linktree-section-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.linktree-section-grid a {
+  min-height: 112px;
+  display: grid;
+  align-content: end;
+  overflow: hidden;
+  border-radius: 18px;
+  position: relative;
+  isolation: isolate;
+  color: #fff;
+  box-shadow: 0 14px 30px rgba(66, 47, 35, .14);
+}
+
+.linktree-section-grid img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+  transition: transform .25s ease;
+}
+
+.linktree-section-grid a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 34%, rgba(0,0,0,.58));
+  z-index: -1;
+}
+
+.linktree-section-grid a:hover img {
+  transform: scale(1.06);
+}
+
+.linktree-section-grid span {
+  padding: 13px;
+  font-weight: 800;
+  text-shadow: 0 2px 12px rgba(0,0,0,.38);
 }
 
 .linktree-showcase {
@@ -2394,4 +2600,8 @@ h1, h2, h3 {
   .admin-hero {
     justify-items: start;
   }
+}
+
+body .mobile-menu.is-open {
+  transform: translateX(0);
 }
