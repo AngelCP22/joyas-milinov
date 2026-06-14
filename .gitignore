@@ -1,2 +1,11 @@
+# Material de trabajo (fotos originales): no publicar
 assets/contact-sheet.jpg
 assets/source-joyas/
+
+# Sistema
+Thumbs.db
+.DS_Store
+node_modules/
+
+# Archivos temporales de la escritura atómica del backend
+backend/data/*.tmp

@@ -1,4 +1,19 @@
-@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap");
+/*
+ * styles.css — Hoja de estilos de Milinov Jewelry.
+ *
+ * Las fuentes (Montserrat + Playfair Display) se cargan desde el <head> de
+ * cada página con <link rel="preconnect"> — NO usar @import aquí: bloquea
+ * el renderizado.
+ *
+ * Estructura del archivo:
+ *   1. Variables y base
+ *   2. Header / navegación / componentes de tienda
+ *   3. Responsive general (980px y 640px)
+ *   4. Home de tienda (.home-page → tienda.html)
+ *   5. Hub de enlaces (.links-home → index.html)
+ *   6. Panel admin (.admin-page → admin.html)
+ *   7. Accesibilidad y utilidades
+ */
 
 :root {
   --color-bg: #FAF7F2;
@@ -2604,4 +2619,96 @@ h1, h2, h3 {
 
 body .mobile-menu.is-open {
   transform: translateX(0);
+}
+
+/* ============================================================
+   7. Accesibilidad y utilidades
+   ============================================================ */
+
+/* Enlace "Saltar al contenido": invisible hasta recibir foco con teclado */
+.skip-link {
+  position: absolute;
+  top: -60px;
+  left: 16px;
+  z-index: 200;
+  background: var(--color-text);
+  color: var(--color-white);
+  padding: 12px 18px;
+  border-radius: 0 0 14px 14px;
+  font-weight: 700;
+  transition: top .2s ease;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* Texto solo para lectores de pantalla */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Indicador de foco visible para navegación con teclado */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--color-gold-dark);
+  outline-offset: 2px;
+}
+
+/* Productos agotados */
+.product-card.is-sold-out .product-image img {
+  filter: grayscale(.55);
+  opacity: .8;
+}
+
+.sold-out-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(48, 43, 39, .85);
+  color: var(--color-white);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+
+.mini-cart-btn:disabled,
+.btn:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.sold-out-note {
+  background: var(--color-blush);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  color: var(--color-gold-dark);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+/* Respeta la preferencia del sistema de reducir movimiento */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

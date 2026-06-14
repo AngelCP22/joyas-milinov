@@ -1,4 +1,20 @@
-﻿const PRODUCTS = [
+/**
+ * products.js — Catálogo estático de respaldo.
+ *
+ * Es lo que ve el cliente cuando el sitio está en un hosting estático o el
+ * backend local está apagado. Si el backend (backend/server.js) está activo,
+ * app.js reemplaza esta lista con el inventario real de backend/data/products.json,
+ * que se administra desde admin.html.
+ *
+ * IMPORTANTE: si publicas el sitio sin backend, mantén esta lista sincronizada
+ * con backend/data/products.json (mismos id, nombres, precios e imágenes).
+ *
+ * Campos: id (único), name, category, collection, material, price (S/),
+ * image (ruta relativa), description. Opcionales: stock, status
+ * ("active" | "sold_out") — si existen, la tienda muestra "Agotado" y
+ * limita el carrito al stock disponible.
+ */
+const PRODUCTS = [
   {
     id: 1,
     name: "Anillo Brillo Eterno",
@@ -100,6 +116,3 @@
     description: "Pulsera ligera con detalle infinito."
   }
 ];
-
-const CATEGORIES = ["Anillos", "Collares", "Aretes", "Pulseras", "Dijes", "Sets", "Hombre", "Mujer"];
-const COLLECTIONS = ["Silver", "Golden", "Rose", "Gold18k"];

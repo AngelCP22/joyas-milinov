@@ -1,4 +1,13 @@
-const API_URL = "http://localhost:3001/api";
+/**
+ * admin.js — Panel de inventario (admin.html).
+ *
+ * Herramienta de uso LOCAL: habla con el backend de backend/server.js
+ * (sin autenticación) para crear, editar y eliminar productos, y subir
+ * imágenes a assets/uploads/. No publicar admin.html en un hosting público.
+ *
+ * Depende de: config.js (esc, money, apiUrl).
+ */
+const API_URL = window.MILINOV?.apiUrl || "http://localhost:3001/api";
 
 const form = document.querySelector("#productForm");
 const tableBody = document.querySelector("#adminProducts");
@@ -9,7 +18,7 @@ const imagePreview = document.querySelector("#imagePreview");
 let products = [];
 
 function moneyAdmin(value) {
-  return `S/ ${Number(value).toFixed(2)}`;
+  return typeof money === "function" ? money(value) : `S/ ${Number(value).toFixed(2)}`;
 }
 
 async function request(path, options = {}) {
@@ -86,20 +95,22 @@ function clearForm() {
   imagePreview.src = "assets/banners/empaque-regalo.jpg";
 }
 
+const STATUS_LABELS = { active: "Activo", draft: "Borrador", sold_out: "Agotado" };
+
 function renderProducts() {
   tableBody.innerHTML = products.map(product => `
     <tr>
       <td>
-        <strong>${product.name}</strong>
-        <small>${product.sku} · ${product.model}</small>
+        <strong>${esc(product.name)}</strong>
+        <small>${esc(product.sku)} · ${esc(product.model)}</small>
       </td>
-      <td>${product.category}</td>
+      <td>${esc(product.category)}</td>
       <td>${moneyAdmin(product.price)}</td>
-      <td><span class="stock-pill ${product.stock <= 2 ? "is-low" : ""}">${product.stock}</span></td>
-      <td><span class="status-pill ${product.status}">${product.status}</span></td>
+      <td><span class="stock-pill ${product.stock <= 2 ? "is-low" : ""}">${Number(product.stock)}</span></td>
+      <td><span class="status-pill ${esc(product.status)}">${STATUS_LABELS[product.status] || esc(product.status)}</span></td>
       <td>
-        <button type="button" data-edit="${product.id}">Editar</button>
-        <button type="button" data-delete="${product.id}">Eliminar</button>
+        <button type="button" data-edit="${Number(product.id)}">Editar</button>
+        <button type="button" data-delete="${Number(product.id)}">Eliminar</button>
       </td>
     </tr>
   `).join("");
@@ -174,6 +185,61 @@ imagePath.addEventListener("input", () => {
   if (imagePath.value.trim()) imagePreview.src = imagePath.value.trim();
 });
 
+/**
+ * Exporta el catálogo actual del backend al formato de js/products.js y lo
+ * descarga. Sirve para sincronizar la tienda pública cuando se publica SIN
+ * backend (hosting estático): reemplazas js/products.js por este archivo y
+ * la portada muestra exactamente el mismo inventario que gestionaste aquí.
+ * Así "el admin gestiona todo" sin que la tienda principal dependa del backend.
+ */
+function exportBackup() {
+  if (!products.length) {
+    setStatus("No hay productos para exportar");
+    return;
+  }
+
+  const items = products.map(product => {
+    const fields = {
+      id: product.id,
+      name: product.name,
+      category: product.category,
+      collection: product.collection,
+      material: product.material,
+      price: product.price,
+      image: product.image,
+      description: product.description,
+      stock: product.stock,
+      status: product.status
+    };
+    const body = Object.entries(fields)
+      .map(([key, value]) => `    ${key}: ${JSON.stringify(value)}`)
+      .join(",\n");
+    return `  {\n${body}\n  }`;
+  }).join(",\n");
+
+  const header =
+    "/**\n" +
+    " * products.js — Catálogo estático de respaldo (generado desde admin.html).\n" +
+    " *\n" +
+    " * Reemplaza este archivo en tu hosting para que la tienda pública (sin backend)\n" +
+    " * muestre el mismo inventario del panel. No editar a mano: re-exportar desde el admin.\n" +
+    ` * Generado: ${new Date().toLocaleString("es-PE")}\n` +
+    " */\n";
+  const content = `${header}const PRODUCTS = [\n${items}\n];\n`;
+
+  const blob = new Blob([content], { type: "text/javascript;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "products.js";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+  setStatus("Respaldo descargado: reemplaza js/products.js en tu hosting");
+}
+
 document.querySelector("#clearForm").addEventListener("click", clearForm);
 document.querySelector("#reloadProducts").addEventListener("click", loadProducts);
+document.querySelector("#exportBackup").addEventListener("click", exportBackup);
 loadProducts();

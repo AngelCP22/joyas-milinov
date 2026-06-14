@@ -1,14 +1,27 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Milinov Jewelry | Contacto</title>
-  <meta name="description" content="Milinov Jewelry - joyas delicadas, elegantes y diseñadas para brillar contigo.">
+  <title>Contacto | Milinov Jewelry</title>
+  <meta name="description" content="Escríbenos para resolver dudas, coordinar envíos o pedir asesoría para elegir tu joya Milinov. Atención directa por WhatsApp.">
+  <meta name="theme-color" content="#FAF7F2">
+  <link rel="canonical" href="https://www.milinovjewelry.com/contacto.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Contacto | Milinov Jewelry">
+  <meta property="og:description" content="Coordina tu pedido y recibe asesoría por WhatsApp.">
+  <meta property="og:image" content="https://www.milinovjewelry.com/assets/banners/contacto.jpg">
+  <meta property="og:url" content="https://www.milinovjewelry.com/contacto.html">
+  <meta property="og:locale" content="es_PE">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap">
   <link rel="stylesheet" href="css/styles.css">
 </head>
-<body class="">
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
   <div class="top-bar">
     <div class="container">
       <span>Envíos a todo el Perú</span>
@@ -18,18 +31,18 @@
 
   <header class="header desktop-header">
     <div class="container header-inner">
-      <nav class="nav">
-        <a href="index.html">Inicio</a>
+      <nav class="nav" aria-label="Navegación principal">
+        <a href="index.html">Tienda</a>
         <a href="catalogo.html">Catálogo</a>
         <a href="nosotros.html">Nosotros</a>
-        <a href="contacto.html">Contacto</a>
+        <a href="contacto.html" aria-current="page">Contacto</a>
       </nav>
 
       <a class="logo" href="index.html">Milinov <span>Jewelry</span></a>
 
       <div class="header-actions">
-        <input class="search-box" id="globalSearch" type="search" placeholder="Buscar joyas...">
-        <button class="icon-btn" type="button" aria-label="Carrito" data-open-cart>🛍<span class="cart-count" data-cart-count>0</span></button>
+        <input class="search-box" id="globalSearch" type="search" placeholder="Buscar joyas..." aria-label="Buscar joyas">
+        <button class="icon-btn" type="button" aria-label="Abrir carrito" data-open-cart>🛍<span class="cart-count" data-cart-count>0</span></button>
       </div>
     </div>
   </header>
@@ -38,26 +51,26 @@
     <div class="container header-inner">
       <button class="icon-btn" type="button" data-open-menu aria-label="Abrir menú">☰</button>
       <a class="logo" href="index.html">Milinov <span>Jewelry</span></a>
-      <button class="icon-btn" type="button" data-open-cart aria-label="Carrito">🛍<span class="cart-count" data-cart-count>0</span></button>
+      <button class="icon-btn" type="button" data-open-cart aria-label="Abrir carrito">🛍<span class="cart-count" data-cart-count>0</span></button>
     </div>
   </header>
 
-  <aside class="mobile-menu">
+  <aside class="mobile-menu" aria-label="Menú móvil">
     <div class="mobile-menu-head">
       <a class="logo" href="index.html">Milinov <span>Jewelry</span></a>
-      <button class="close-btn" type="button" data-close-menu>×</button>
+      <button class="close-btn" type="button" data-close-menu aria-label="Cerrar menú">×</button>
     </div>
     <nav>
-      <a href="index.html">Inicio</a>
+      <a href="index.html">Tienda</a>
       <a href="catalogo.html">Catálogo</a>
       <a href="nosotros.html">Nosotros</a>
-      <a href="contacto.html">Contacto</a>
-      <a href="https://wa.me/51999999999" target="_blank">WhatsApp</a>
+      <a href="contacto.html" aria-current="page">Contacto</a>
+      <a href="enlaces.html">Enlaces y redes</a>
+      <a href="https://wa.me/51999999999" target="_blank" rel="noopener">WhatsApp</a>
     </nav>
   </aside>
 
-
-  <main>
+  <main id="contenido">
     <section class="page-hero">
       <div class="container">
         <span class="eyebrow">Contacto</span>
@@ -73,13 +86,16 @@
           <h2>Coordina tu pedido con Milinov</h2>
           <p>Completa el formulario y se abrirá WhatsApp con tu mensaje listo para enviar.</p>
           <form class="contact-form" id="contactForm">
-            <input name="name" type="text" placeholder="Tu nombre" required>
-            <input name="email" type="email" placeholder="Tu correo" required>
-            <textarea name="message" placeholder="Cuéntanos qué joya estás buscando" required></textarea>
+            <label class="sr-only" for="contactName">Tu nombre</label>
+            <input id="contactName" name="name" type="text" placeholder="Tu nombre" autocomplete="name" required>
+            <label class="sr-only" for="contactEmail">Tu correo</label>
+            <input id="contactEmail" name="email" type="email" placeholder="Tu correo" autocomplete="email" required>
+            <label class="sr-only" for="contactMessage">Mensaje</label>
+            <textarea id="contactMessage" name="message" placeholder="Cuéntanos qué joya estás buscando" required></textarea>
             <button class="btn btn-whatsapp" type="submit">Enviar por WhatsApp</button>
           </form>
         </div>
-        <img class="contact-image" src="assets/banners/contacto.jpg" alt="Contacto Milinov Jewelry" onerror="this.src='https://images.unsplash.com/photo-1611085583191-a3b181a88401?auto=format&fit=crop&w=1100&q=85'">
+        <img class="contact-image" src="assets/banners/contacto.jpg" alt="Collar de corazón Milinov Jewelry" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='assets/placeholder.svg'">
       </div>
     </section>
   </main>
@@ -106,7 +122,8 @@
       </div>
       <div>
         <h4>Contacto</h4>
-        <a href="https://wa.me/51999999999" target="_blank">WhatsApp</a>
+        <a href="enlaces.html">Enlaces y redes</a>
+        <a href="https://wa.me/51999999999" target="_blank" rel="noopener">WhatsApp</a>
         <a href="mailto:hola@milinovjewelry.com">hola@milinovjewelry.com</a>
         <p>Lima, Perú</p>
       </div>
@@ -115,10 +132,10 @@
 
   <div class="overlay"></div>
 
-  <aside class="cart-drawer">
+  <aside class="cart-drawer" role="dialog" aria-label="Carrito de compras">
     <div class="cart-head">
       <strong>Tu carrito</strong>
-      <button class="close-btn" type="button" data-close-cart>×</button>
+      <button class="close-btn" type="button" data-close-cart aria-label="Cerrar carrito">×</button>
     </div>
     <div class="cart-items" id="cartItems"></div>
     <div class="cart-footer">
@@ -131,8 +148,9 @@
     </div>
   </aside>
 
-  <script src="js/products.js"></script>
-  <script src="js/cart.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/config.js" defer></script>
+  <script src="js/products.js" defer></script>
+  <script src="js/cart.js" defer></script>
+  <script src="js/app.js" defer></script>
 </body>
 </html>

@@ -1,14 +1,27 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Milinov Jewelry | Nosotros</title>
-  <meta name="description" content="Milinov Jewelry - joyas delicadas, elegantes y diseñadas para brillar contigo.">
+  <title>Nosotros | Milinov Jewelry</title>
+  <meta name="description" content="Conoce Milinov Jewelry: joyas femeninas, elegantes y delicadas en Plata 950 y enchape de oro 18k, con empaque listo para regalar.">
+  <meta name="theme-color" content="#FAF7F2">
+  <link rel="canonical" href="https://www.milinovjewelry.com/nosotros.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Nosotros | Milinov Jewelry">
+  <meta property="og:description" content="Joyas que cuentan una historia sutil. Conoce la esencia de Milinov Jewelry.">
+  <meta property="og:image" content="https://www.milinovjewelry.com/assets/banners/nosotros.jpg">
+  <meta property="og:url" content="https://www.milinovjewelry.com/nosotros.html">
+  <meta property="og:locale" content="es_PE">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap">
   <link rel="stylesheet" href="css/styles.css">
 </head>
-<body class="">
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
   <div class="top-bar">
     <div class="container">
       <span>Envíos a todo el Perú</span>
@@ -18,18 +31,18 @@
 
   <header class="header desktop-header">
     <div class="container header-inner">
-      <nav class="nav">
-        <a href="index.html">Inicio</a>
+      <nav class="nav" aria-label="Navegación principal">
+        <a href="index.html">Tienda</a>
         <a href="catalogo.html">Catálogo</a>
-        <a href="nosotros.html">Nosotros</a>
+        <a href="nosotros.html" aria-current="page">Nosotros</a>
         <a href="contacto.html">Contacto</a>
       </nav>
 
       <a class="logo" href="index.html">Milinov <span>Jewelry</span></a>
 
       <div class="header-actions">
-        <input class="search-box" id="globalSearch" type="search" placeholder="Buscar joyas...">
-        <button class="icon-btn" type="button" aria-label="Carrito" data-open-cart>🛍<span class="cart-count" data-cart-count>0</span></button>
+        <input class="search-box" id="globalSearch" type="search" placeholder="Buscar joyas..." aria-label="Buscar joyas">
+        <button class="icon-btn" type="button" aria-label="Abrir carrito" data-open-cart>🛍<span class="cart-count" data-cart-count>0</span></button>
       </div>
     </div>
   </header>
@@ -38,26 +51,26 @@
     <div class="container header-inner">
       <button class="icon-btn" type="button" data-open-menu aria-label="Abrir menú">☰</button>
       <a class="logo" href="index.html">Milinov <span>Jewelry</span></a>
-      <button class="icon-btn" type="button" data-open-cart aria-label="Carrito">🛍<span class="cart-count" data-cart-count>0</span></button>
+      <button class="icon-btn" type="button" data-open-cart aria-label="Abrir carrito">🛍<span class="cart-count" data-cart-count>0</span></button>
     </div>
   </header>
 
-  <aside class="mobile-menu">
+  <aside class="mobile-menu" aria-label="Menú móvil">
     <div class="mobile-menu-head">
       <a class="logo" href="index.html">Milinov <span>Jewelry</span></a>
-      <button class="close-btn" type="button" data-close-menu>×</button>
+      <button class="close-btn" type="button" data-close-menu aria-label="Cerrar menú">×</button>
     </div>
     <nav>
-      <a href="index.html">Inicio</a>
+      <a href="index.html">Tienda</a>
       <a href="catalogo.html">Catálogo</a>
-      <a href="nosotros.html">Nosotros</a>
+      <a href="nosotros.html" aria-current="page">Nosotros</a>
       <a href="contacto.html">Contacto</a>
-      <a href="https://wa.me/51999999999" target="_blank">WhatsApp</a>
+      <a href="enlaces.html">Enlaces y redes</a>
+      <a href="https://wa.me/51999999999" target="_blank" rel="noopener">WhatsApp</a>
     </nav>
   </aside>
 
-
-  <main>
+  <main id="contenido">
     <section class="page-hero">
       <div class="container">
         <span class="eyebrow">Nosotros</span>
@@ -75,7 +88,7 @@
           <p>Nuestro objetivo es que cada compra se sienta especial: desde la elección de la pieza hasta el empaque listo para regalar.</p>
           <a href="catalogo.html" class="btn btn-primary">Conocer catálogo</a>
         </div>
-        <img class="about-image" src="assets/banners/nosotros.jpg" alt="Milinov Jewelry boutique" onerror="this.src='https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1100&q=85'">
+        <img class="about-image" src="assets/banners/nosotros.jpg" alt="Pulsera de plata Milinov Jewelry" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='assets/placeholder.svg'">
       </div>
     </section>
 
@@ -111,7 +124,8 @@
       </div>
       <div>
         <h4>Contacto</h4>
-        <a href="https://wa.me/51999999999" target="_blank">WhatsApp</a>
+        <a href="enlaces.html">Enlaces y redes</a>
+        <a href="https://wa.me/51999999999" target="_blank" rel="noopener">WhatsApp</a>
         <a href="mailto:hola@milinovjewelry.com">hola@milinovjewelry.com</a>
         <p>Lima, Perú</p>
       </div>
@@ -120,10 +134,10 @@
 
   <div class="overlay"></div>
 
-  <aside class="cart-drawer">
+  <aside class="cart-drawer" role="dialog" aria-label="Carrito de compras">
     <div class="cart-head">
       <strong>Tu carrito</strong>
-      <button class="close-btn" type="button" data-close-cart>×</button>
+      <button class="close-btn" type="button" data-close-cart aria-label="Cerrar carrito">×</button>
     </div>
     <div class="cart-items" id="cartItems"></div>
     <div class="cart-footer">
@@ -136,8 +150,9 @@
     </div>
   </aside>
 
-  <script src="js/products.js"></script>
-  <script src="js/cart.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/config.js" defer></script>
+  <script src="js/products.js" defer></script>
+  <script src="js/cart.js" defer></script>
+  <script src="js/app.js" defer></script>
 </body>
 </html>

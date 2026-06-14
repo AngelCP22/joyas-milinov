@@ -1,0 +1,10 @@
+# Milinov Jewelry — robots.txt
+# IMPORTANTE: al publicar, reemplaza www.milinovjewelry.com por tu dominio real
+# (igual que en sitemap.xml y en las etiquetas <link rel="canonical"> del HTML).
+
+User-agent: *
+Allow: /
+# El panel admin es una herramienta local: no debe indexarse ni publicarse
+Disallow: /admin.html
+
+Sitemap: https://www.milinovjewelry.com/sitemap.xml

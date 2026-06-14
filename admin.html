@@ -5,7 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Milinov Jewelry | Admin</title>
   <meta name="description" content="Panel local para administrar productos de Milinov Jewelry.">
+  <!-- Herramienta de uso LOCAL: no indexar ni publicar en hosting público -->
+  <meta name="robots" content="noindex, nofollow">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="admin-page">
@@ -17,7 +22,7 @@
         <h1>Inventario y precios</h1>
         <p>Agrega nuevas joyas, cambia precios, unidades disponibles, categorías y modelos.</p>
       </div>
-      <a class="btn btn-outline" href="tienda.html">Ver tienda</a>
+      <a class="btn btn-outline" href="index.html">Ver tienda</a>
     </section>
 
     <section class="admin-grid">
@@ -78,6 +83,7 @@
           <div class="admin-actions compact">
             <a class="btn btn-outline" href="catalogo.html">Ver catálogo</a>
             <button class="btn btn-outline" type="button" id="reloadProducts">Actualizar</button>
+            <button class="btn btn-outline" type="button" id="exportBackup" title="Descarga js/products.js con el catálogo actual para publicar la tienda sin backend">Exportar respaldo</button>
           </div>
         </div>
         <div class="admin-table-wrap">
@@ -99,6 +105,7 @@
     </section>
   </main>
 
-  <script src="js/admin.js"></script>
+  <script src="js/config.js" defer></script>
+  <script src="js/admin.js" defer></script>
 </body>
 </html>
