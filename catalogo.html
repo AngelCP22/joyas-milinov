@@ -6,12 +6,12 @@
   <title>Catálogo de joyas | Milinov Jewelry</title>
   <meta name="description" content="Catálogo Milinov Jewelry: busca y filtra collares, anillos, aretes, pulseras y dijes en Plata 950 y enchape de oro 18k. Pide por WhatsApp.">
   <meta name="theme-color" content="#FAF7F2">
-  <link rel="canonical" href="https://www.milinovjewelry.com/catalogo.html">
+  <link rel="canonical" href="https://www.milinovjoyeria.com/catalogo.html">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Catálogo de joyas | Milinov Jewelry">
   <meta property="og:description" content="Busca y filtra joyas delicadas en Plata 950 y enchape de oro 18k. Pide por WhatsApp.">
-  <meta property="og:image" content="https://www.milinovjewelry.com/assets/banners/hero-collar.jpg">
-  <meta property="og:url" content="https://www.milinovjewelry.com/catalogo.html">
+  <meta property="og:image" content="https://www.milinovjoyeria.com/assets/banners/hero-collar.jpg">
+  <meta property="og:url" content="https://www.milinovjoyeria.com/catalogo.html">
   <meta property="og:locale" content="es_PE">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,29 +29,29 @@
     </div>
   </div>
 
-  <header class="header desktop-header">
-    <div class="container header-inner">
-      <nav class="nav" aria-label="Navegación principal">
-        <a href="index.html">Tienda</a>
-        <a href="catalogo.html" aria-current="page">Catálogo</a>
-        <a href="nosotros.html">Nosotros</a>
-        <a href="contacto.html">Contacto</a>
-      </nav>
-
-      <a class="logo" href="index.html">Milinov <span>Jewelry</span></a>
-
-      <div class="header-actions">
-        <input class="search-box" id="globalSearch" type="search" placeholder="Buscar joyas..." aria-label="Buscar joyas">
-        <button class="icon-btn" type="button" aria-label="Abrir carrito" data-open-cart>🛍<span class="cart-count" data-cart-count>0</span></button>
+  <header class="header">
+    <div class="container milinov-header">
+      <div class="store-left">
+        <button class="clean-icon menu-toggle" type="button" data-open-menu aria-label="Abrir menú"><i data-lucide="menu"></i></button>
+        <nav class="store-nav" aria-label="Navegación principal">
+          <a href="index.html">Tienda</a>
+          <a href="catalogo.html" aria-current="page">Catálogo</a>
+          <a href="nosotros.html">Nosotros</a>
+          <a href="contacto.html">Contacto</a>
+        </nav>
       </div>
-    </div>
-  </header>
-
-  <header class="header mobile-header">
-    <div class="container header-inner">
-      <button class="icon-btn" type="button" data-open-menu aria-label="Abrir menú">☰</button>
-      <a class="logo" href="index.html">Milinov <span>Jewelry</span></a>
-      <button class="icon-btn" type="button" data-open-cart aria-label="Abrir carrito">🛍<span class="cart-count" data-cart-count>0</span></button>
+      <a class="brand-logo" href="index.html" aria-label="Milinov Jewelry">
+        <span class="brand-mark">✦</span>
+        <strong>Milinov</strong>
+        <small>Jewelry</small>
+      </a>
+      <div class="header-tools">
+        <a class="clean-icon" href="catalogo.html" aria-label="Ir al catálogo"><i data-lucide="search"></i></a>
+        <button class="clean-icon" type="button" data-open-cart aria-label="Abrir carrito">
+          <i data-lucide="shopping-bag"></i>
+          <span class="cart-count" data-cart-count>0</span>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -74,7 +74,7 @@
     <section class="page-hero">
       <div class="container">
         <span class="eyebrow">Catálogo</span>
-        <h1>Joyas para cada momento</h1>
+        <h1 id="catalogTitle">Joyas para cada momento</h1>
         <p>Busca, filtra y agrega tus piezas favoritas al carrito. Al finalizar, envía tu pedido por WhatsApp.</p>
       </div>
     </section>
@@ -84,6 +84,9 @@
         <!-- Las opciones de los filtros se completan automáticamente desde el catálogo (js/app.js) -->
         <div class="catalog-toolbar">
           <input id="catalogSearch" data-filter="search" type="search" placeholder="Buscar por nombre, material o colección" aria-label="Buscar en el catálogo">
+          <select id="genderFilter" data-filter="gender" aria-label="Filtrar por género">
+            <option value="all">Hombre y Mujer</option>
+          </select>
           <select id="categoryFilter" data-filter="category" aria-label="Filtrar por categoría">
             <option value="all">Todas las categorías</option>
           </select>
@@ -128,8 +131,11 @@
       <div>
         <h4>Contacto</h4>
         <a href="enlaces.html">Enlaces y redes</a>
+        <a href="terminos.html">Términos y Condiciones</a>
+        <a href="privacidad.html">Política de Privacidad</a>
+        <a href="reclamaciones.html">Libro de Reclamaciones</a>
         <a href="https://wa.me/51999999999" target="_blank" rel="noopener">WhatsApp</a>
-        <a href="mailto:hola@milinovjewelry.com">hola@milinovjewelry.com</a>
+        <a href="mailto:hola@milinovjoyeria.com">hola@milinovjoyeria.com</a>
         <p>Lima, Perú</p>
       </div>
     </div>
@@ -153,7 +159,9 @@
     </div>
   </aside>
 
+  <script src="https://unpkg.com/lucide@0.453.0/dist/umd/lucide.min.js" defer></script>
   <script src="js/config.js" defer></script>
+  <script src="js/analytics.js" defer></script>
   <script src="js/products.js" defer></script>
   <script src="js/cart.js" defer></script>
   <script src="js/app.js" defer></script>

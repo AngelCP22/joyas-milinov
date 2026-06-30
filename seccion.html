@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sección | Milinov Jewelry</title>
+  <meta name="description" content="Elige material: Plata 950, cobre con enchape de oro 18k o relojes — joyas Milinov para mujer y hombre.">
+  <meta name="theme-color" content="#FAF7F2">
+  <link rel="canonical" href="https://www.milinovjoyeria.com/seccion.html">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+  <div class="top-bar">
+    <div class="container">
+      <span>Envíos a todo el Perú</span>
+      <span>Empaque listo para regalar</span>
+    </div>
+  </div>
+
+  <header class="header">
+    <div class="container milinov-header">
+      <div class="store-left">
+        <button class="clean-icon menu-toggle" type="button" data-open-menu aria-label="Abrir menú"><i data-lucide="menu"></i></button>
+        <nav class="store-nav" aria-label="Navegación principal">
+          <a href="index.html">Tienda</a>
+          <a href="catalogo.html">Catálogo</a>
+          <a href="nosotros.html">Nosotros</a>
+          <a href="contacto.html">Contacto</a>
+        </nav>
+      </div>
+      <a class="brand-logo" href="index.html" aria-label="Milinov Jewelry">
+        <span class="brand-mark">✦</span>
+        <strong>Milinov</strong>
+        <small>Jewelry</small>
+      </a>
+      <div class="header-tools">
+        <a class="clean-icon" href="catalogo.html" aria-label="Ir al catálogo"><i data-lucide="search"></i></a>
+        <button class="clean-icon" type="button" data-open-cart aria-label="Abrir carrito">
+          <i data-lucide="shopping-bag"></i>
+          <span class="cart-count" data-cart-count>0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <aside class="mobile-menu" aria-label="Menú móvil">
+    <div class="mobile-menu-head">
+      <a class="brand-logo small" href="index.html"><strong>Milinov</strong><small>Jewelry</small></a>
+      <button class="close-btn" type="button" data-close-menu aria-label="Cerrar menú">×</button>
+    </div>
+    <nav>
+      <a href="index.html">Tienda</a>
+      <a href="catalogo.html">Catálogo</a>
+      <a href="nosotros.html">Nosotros</a>
+      <a href="contacto.html">Contacto</a>
+      <a href="enlaces.html">Enlaces y redes</a>
+      <a href="https://wa.me/51999999999" target="_blank" rel="noopener">WhatsApp</a>
+    </nav>
+  </aside>
+
+  <main id="contenido">
+    <section class="page-hero">
+      <div class="container">
+        <span class="eyebrow">Elige el material</span>
+        <h1 id="seccionTitulo">Nuestras joyas</h1>
+        <p>Plata 950, cobre con enchape de oro 18k y relojes.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <!-- app.js → initSeccion() llena esto según ?genero=Hombre|Mujer -->
+      <div class="container seccion-grid" id="seccionContent"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div>
+        <h3 class="logo">Milinov <span>Jewelry</span></h3>
+        <p>Nadie es como tú y ese es tu poder. Joyas delicadas para elevar tu brillo diario.</p>
+      </div>
+      <div>
+        <h4>Tienda</h4>
+        <a href="catalogo.html">Catálogo</a>
+        <a href="seccion.html?genero=Mujer">Mujer</a>
+        <a href="seccion.html?genero=Hombre">Hombre</a>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <a href="terminos.html">Términos y Condiciones</a>
+        <a href="privacidad.html">Política de Privacidad</a>
+        <a href="reclamaciones.html">Libro de Reclamaciones</a>
+      </div>
+      <div>
+        <h4>Contacto</h4>
+        <a href="enlaces.html">Enlaces y redes</a>
+        <a href="https://wa.me/51999999999" target="_blank" rel="noopener">WhatsApp</a>
+        <a href="mailto:hola@milinovjoyeria.com">hola@milinovjoyeria.com</a>
+        <p>Lima, Perú</p>
+      </div>
+    </div>
+  </footer>
+
+  <div class="overlay"></div>
+
+  <aside class="cart-drawer" role="dialog" aria-label="Carrito de compras">
+    <div class="cart-head">
+      <strong>Tu carrito</strong>
+      <button class="close-btn" type="button" data-close-cart aria-label="Cerrar carrito">×</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-footer">
+      <div class="cart-footer-row"><span>Total</span><strong id="cartTotal">S/ 0.00</strong></div>
+      <button class="btn btn-primary" id="checkoutWhatsapp" type="button">Enviar pedido por WhatsApp</button>
+      <a href="catalogo.html" class="btn btn-outline">Seguir comprando</a>
+    </div>
+  </aside>
+
+  <script src="https://unpkg.com/lucide@0.453.0/dist/umd/lucide.min.js" defer></script>
+  <script src="js/config.js" defer></script>
+  <script src="js/analytics.js" defer></script>
+  <script src="js/products.js" defer></script>
+  <script src="js/cart.js" defer></script>
+  <script src="js/app.js" defer></script>
+</body>
+</html>

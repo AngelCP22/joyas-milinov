@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Milinov Jewelry | Muy pronto</title>
+  <meta name="description" content="Milinov Jewelry abre muy pronto. Joyas delicadas en Plata 950 y enchape de oro 18k. Lanzamiento: 17 de julio de 2026.">
+  <meta name="theme-color" content="#FAF7F2">
+  <link rel="canonical" href="https://www.milinovjoyeria.com/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Milinov Jewelry | Muy pronto">
+  <meta property="og:description" content="Algo hermoso está por brillar. Nuestra tienda abre el 17 de julio de 2026.">
+  <meta property="og:image" content="https://www.milinovjoyeria.com/assets/banners/hero-collar.jpg">
+  <meta property="og:locale" content="es_PE">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap">
+  <style>
+    :root {
+      --bg: #FAF7F2; --ivory: #F7F1E8; --blush: #F4E4DF;
+      --gold: #B99745; --gold-dark: #8A6A28; --rose: #b05f6a;
+      --text: #302B27; --muted: #7B746E; --border: #E8DDD0;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100dvh; color: var(--text);
+      font-family: "Montserrat", -apple-system, BlinkMacSystemFont, sans-serif;
+      background:
+        radial-gradient(circle at 18% 14%, rgba(232, 201, 183, .45), transparent 34%),
+        radial-gradient(circle at 84% 82%, rgba(244, 228, 223, .55), transparent 40%),
+        linear-gradient(180deg, #fffdf9 0%, #fbf3ec 55%, #f7ede2 100%);
+      display: grid; place-items: center; padding: 40px 20px;
+      overflow: hidden; position: relative;
+    }
+
+    /* Destellos de joyería que titilan */
+    .sparkles { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+    .sparkle {
+      position: absolute; color: var(--gold);
+      font-size: var(--sz, 16px); opacity: 0;
+      animation: twinkle var(--dur, 4s) ease-in-out var(--delay, 0s) infinite;
+      text-shadow: 0 0 10px rgba(185, 151, 69, .5);
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0; transform: scale(.6) rotate(0deg); }
+      50% { opacity: .9; transform: scale(1) rotate(18deg); }
+    }
+
+    .shell {
+      position: relative; z-index: 1; width: min(680px, 100%);
+      text-align: center; display: grid; gap: 22px; justify-items: center;
+      animation: rise .9s ease both;
+    }
+    @keyframes rise { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+
+    .brand { display: grid; justify-items: center; gap: 8px; color: var(--gold-dark); }
+    .brand .mark { font-size: 30px; line-height: 1; animation: spin 9s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .brand strong {
+      font-family: "Montserrat", sans-serif; font-weight: 400;
+      font-size: clamp(34px, 7vw, 56px); letter-spacing: .16em; text-transform: uppercase;
+    }
+    .brand small {
+      font-family: "Playfair Display", serif; letter-spacing: .55em;
+      padding-left: .55em; font-size: 13px; color: var(--muted);
+    }
+
+    .eyebrow {
+      text-transform: uppercase; letter-spacing: .26em; font-size: 12px;
+      font-weight: 700; color: var(--rose);
+    }
+    h1 {
+      margin: 0; font-family: "Playfair Display", serif; font-weight: 600;
+      font-size: clamp(34px, 6vw, 60px); line-height: 1.05;
+      background: linear-gradient(100deg, var(--gold-dark) 0%, #d7b25a 30%, #fff3d6 48%, #d7b25a 66%, var(--gold-dark) 100%);
+      background-size: 220% auto;
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent; color: transparent;
+      animation: shimmer 5s linear infinite;
+    }
+    @keyframes shimmer { to { background-position: 220% center; } }
+
+    .lead { margin: 0; color: var(--muted); font-size: clamp(15px, 2.4vw, 18px); line-height: 1.7; max-width: 30ch; }
+
+    /* Cuenta regresiva */
+    .countdown { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 6px; }
+    .unit {
+      min-width: 92px; padding: 18px 14px; border-radius: 18px;
+      background: rgba(255, 255, 255, .72); border: 1px solid var(--border);
+      box-shadow: 0 14px 34px rgba(82, 64, 47, .12); backdrop-filter: blur(6px);
+    }
+    .unit .num {
+      font-family: "Playfair Display", serif; font-weight: 700;
+      font-size: clamp(34px, 7vw, 50px); color: var(--text); line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .unit .lbl { display: block; margin-top: 8px; font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--gold-dark); }
+
+    .date-tag {
+      display: inline-flex; align-items: center; gap: 10px; margin-top: 4px;
+      padding: 10px 20px; border-radius: 999px; background: var(--blush); color: var(--gold-dark);
+      font-weight: 700; font-size: 14px; letter-spacing: .02em;
+    }
+
+    .social { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-top: 4px; }
+    .social a {
+      display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
+      padding: 11px 18px; border-radius: 999px; font-weight: 600; font-size: 14px;
+      border: 1px solid var(--border); color: var(--text); background: rgba(255,255,255,.6);
+      transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+    .social a:hover { transform: translateY(-2px); background: #fff; box-shadow: 0 10px 24px rgba(122, 84, 53, .14); }
+    .social a.wa { background: #25D366; color: #fff; border-color: #25D366; }
+    .social svg { width: 18px; height: 18px; }
+
+    .foot { margin-top: 8px; color: var(--muted); font-size: 13px; }
+
+    .open-msg { display: none; }
+    .is-open .countdown, .is-open .date-tag { display: none; }
+    .is-open .open-msg { display: grid; gap: 14px; justify-items: center; }
+    .open-btn {
+      padding: 15px 28px; border-radius: 999px; background: var(--gold); color: #fff;
+      font-weight: 700; text-decoration: none; box-shadow: 0 12px 26px rgba(185,151,69,.3);
+      transition: transform .2s ease;
+    }
+    .open-btn:hover { transform: translateY(-2px); }
+
+    a:focus-visible, .social a:focus-visible { outline: 2px solid var(--gold-dark); outline-offset: 3px; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .sparkle, .brand .mark, h1, .shell { animation: none !important; }
+      h1 { -webkit-text-fill-color: var(--gold-dark); color: var(--gold-dark); }
+      .sparkle { opacity: .5; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sparkles" aria-hidden="true" id="sparkles"></div>
+
+  <main class="shell" id="shell">
+    <div class="brand">
+      <span class="mark">✦</span>
+      <strong>Milinov</strong>
+      <small>JEWELRY</small>
+    </div>
+
+    <span class="eyebrow">Muy pronto</span>
+    <h1>Algo hermoso está por brillar</h1>
+    <p class="lead">Estamos puliendo cada detalle de nuestra nueva tienda. Nadie es como tú, y ese es tu poder.</p>
+
+    <div class="countdown" id="countdown" role="timer" aria-label="Cuenta regresiva para la apertura">
+      <div class="unit"><span class="num" id="d">00</span><span class="lbl">Días</span></div>
+      <div class="unit"><span class="num" id="h">00</span><span class="lbl">Horas</span></div>
+      <div class="unit"><span class="num" id="m">00</span><span class="lbl">Min</span></div>
+      <div class="unit"><span class="num" id="s">00</span><span class="lbl">Seg</span></div>
+    </div>
+
+    <span class="date-tag">✧ Lanzamiento: 17 de julio de 2026</span>
+
+    <div class="open-msg">
+      <h1>¡Ya estamos abiertos!</h1>
+      <a class="open-btn" href="index.html">Entrar a la tienda</a>
+    </div>
+
+    <div class="social">
+      <a href="https://www.instagram.com/milinov_joyas" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7.8 2h8.4A5.8 5.8 0 0 1 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8A5.8 5.8 0 0 1 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2Zm0 2A3.8 3.8 0 0 0 4 7.8v8.4A3.8 3.8 0 0 0 7.8 20h8.4a3.8 3.8 0 0 0 3.8-3.8V7.8A3.8 3.8 0 0 0 16.2 4H7.8Zm8.7 2.2a1.3 1.3 0 1 1 0 2.6 1.3 1.3 0 0 1 0-2.6ZM12 7.4A4.6 4.6 0 1 1 12 16.6 4.6 4.6 0 0 1 12 7.4Zm0 2A2.6 2.6 0 1 0 12 14.6 2.6 2.6 0 0 0 12 9.4Z"/></svg>
+        Instagram
+      </a>
+      <a class="wa" href="https://wa.me/51999999999" target="_blank" rel="noopener" aria-label="WhatsApp">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.4 5 5.1-1.3A10 10 0 1 0 12 2Zm5.5 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .3-3.4-.7-2.9-1.2-4.7-4.2-4.8-4.4-.1-.2-1.1-1.5-1.1-2.8s.7-2 .9-2.2c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.4 0 .6l-.4.5c-.2.2-.3.4-.1.6.2.4.9 1.4 1.9 2.3 1.2 1 2 1.3 2.3 1.5.2.1.4.1.6-.1l.7-.9c.2-.2.4-.2.6-.1l1.8.9c.2.1.4.2.5.3.1.3.1.7-.1 1.1Z"/></svg>
+        WhatsApp
+      </a>
+    </div>
+
+    <p class="foot">Plata 950 · Enchape de oro 18k · Lima, Perú</p>
+  </main>
+
+  <script>
+    // Genera destellos dispersos (animación del rubro: joyas que brillan).
+    (function () {
+      const layer = document.getElementById("sparkles");
+      const chars = ["✦", "✧", "◆", "✦"];
+      const n = window.matchMedia("(max-width: 640px)").matches ? 14 : 26;
+      let html = "";
+      for (let i = 0; i < n; i++) {
+        const top = Math.random() * 100, left = Math.random() * 100;
+        const sz = 10 + Math.random() * 22, dur = 3 + Math.random() * 4, delay = Math.random() * 5;
+        const ch = chars[i % chars.length];
+        html += `<span class="sparkle" style="top:${top}%;left:${left}%;--sz:${sz}px;--dur:${dur}s;--delay:${delay}s">${ch}</span>`;
+      }
+      layer.innerHTML = html;
+    })();
+
+    // Cuenta regresiva al 17 de julio de 2026 (hora local).
+    (function () {
+      const target = new Date("2026-07-17T00:00:00").getTime();
+      const el = { d: document.getElementById("d"), h: document.getElementById("h"), m: document.getElementById("m"), s: document.getElementById("s") };
+      const pad = v => String(v).padStart(2, "0");
+
+      function tick() {
+        const diff = target - Date.now();
+        if (diff <= 0) {
+          document.getElementById("shell").classList.add("is-open");
+          clearInterval(timer);
+          return;
+        }
+        const day = Math.floor(diff / 86400000);
+        const hr = Math.floor((diff % 86400000) / 3600000);
+        const mn = Math.floor((diff % 3600000) / 60000);
+        const sc = Math.floor((diff % 60000) / 1000);
+        el.d.textContent = pad(day);
+        el.h.textContent = pad(hr);
+        el.m.textContent = pad(mn);
+        el.s.textContent = pad(sc);
+      }
+      tick();
+      const timer = setInterval(tick, 1000);
+    })();
+  </script>
+</body>
+</html>

@@ -2,6 +2,7 @@
   {
     "id": 1,
     "sku": "MIL-ANI-001",
+    "gender": "Mujer",
     "name": "Anillo Brillo Eterno",
     "category": "Anillos",
     "collection": "Silver",
@@ -16,6 +17,7 @@
   {
     "id": 2,
     "sku": "MIL-COL-002",
+    "gender": "Mujer",
     "name": "Collar Dije Corazón",
     "category": "Collares",
     "collection": "Silver",
@@ -30,6 +32,7 @@
   {
     "id": 3,
     "sku": "MIL-ARE-003",
+    "gender": "Mujer",
     "name": "Aretes Dulce Luz",
     "category": "Aretes",
     "collection": "Rose",
@@ -44,6 +47,7 @@
   {
     "id": 4,
     "sku": "MIL-COL-004",
+    "gender": "Mujer",
     "name": "Collar Mini Amor",
     "category": "Collares",
     "collection": "Golden",
@@ -58,8 +62,9 @@
   {
     "id": 5,
     "sku": "MIL-COL-005",
+    "gender": "Hombre",
     "name": "Collar Placa Love",
-    "category": "Dijes",
+    "category": "Collares",
     "collection": "Silver",
     "model": "Placa Love",
     "material": "Plata 950",
@@ -67,11 +72,12 @@
     "stock": 4,
     "status": "active",
     "image": "assets/products/collar-placa-love.jpg",
-    "description": "Collar fino con placa delicada de amor."
+    "description": "Collar fino con placa, sobrio y elegante."
   },
   {
     "id": 6,
     "sku": "MIL-COL-006",
+    "gender": "Mujer",
     "name": "Collar Mini Corazón",
     "category": "Collares",
     "collection": "Golden",
@@ -86,6 +92,7 @@
   {
     "id": 7,
     "sku": "MIL-ARE-007",
+    "gender": "Mujer",
     "name": "Aretes Corazón",
     "category": "Aretes",
     "collection": "Rose",
@@ -100,6 +107,7 @@
   {
     "id": 8,
     "sku": "MIL-COL-008",
+    "gender": "Mujer",
     "name": "Collar Niña Corazón",
     "category": "Collares",
     "collection": "Gold18k",
@@ -113,14 +121,15 @@
   },
   {
     "id": 9,
-    "sku": "MIL-COL-009",
+    "sku": "MIL-DIJ-009",
+    "gender": "Mujer",
     "name": "Collar Osito",
     "category": "Dijes",
     "collection": "Golden",
     "model": "Osito",
     "material": "Cobre + enchape oro 18k",
     "price": 129,
-    "stock": 9,
+    "stock": 2,
     "status": "active",
     "image": "assets/products/collar-osito.jpg",
     "description": "Dije tierno y delicado para regalar."
@@ -128,6 +137,7 @@
   {
     "id": 10,
     "sku": "MIL-PUL-010",
+    "gender": "Hombre",
     "name": "Pulsera Infinito",
     "category": "Pulseras",
     "collection": "Silver",
@@ -138,5 +148,35 @@
     "status": "active",
     "image": "assets/products/pulsera-infinito.jpg",
     "description": "Pulsera ligera con detalle infinito."
+  },
+  {
+    "id": 11,
+    "sku": "MIL-REL-011",
+    "gender": "Mujer",
+    "name": "Reloj Aurora (ejemplo)",
+    "category": "Relojes",
+    "collection": "Gold18k",
+    "model": "Aurora",
+    "material": "Reloj",
+    "price": 189,
+    "stock": 3,
+    "status": "active",
+    "image": "assets/placeholder.svg",
+    "description": "Reloj de ejemplo. Reemplaza la foto y los datos desde el panel."
+  },
+  {
+    "id": 12,
+    "sku": "MIL-REL-012",
+    "gender": "Hombre",
+    "name": "Reloj Clásico (ejemplo)",
+    "category": "Relojes",
+    "collection": "Silver",
+    "model": "Clásico",
+    "material": "Reloj",
+    "price": 219,
+    "stock": 3,
+    "status": "active",
+    "image": "assets/placeholder.svg",
+    "description": "Reloj de ejemplo. Reemplaza la foto y los datos desde el panel."
   }
 ]

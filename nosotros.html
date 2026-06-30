@@ -6,12 +6,12 @@
   <title>Nosotros | Milinov Jewelry</title>
   <meta name="description" content="Conoce Milinov Jewelry: joyas femeninas, elegantes y delicadas en Plata 950 y enchape de oro 18k, con empaque listo para regalar.">
   <meta name="theme-color" content="#FAF7F2">
-  <link rel="canonical" href="https://www.milinovjewelry.com/nosotros.html">
+  <link rel="canonical" href="https://www.milinovjoyeria.com/nosotros.html">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Nosotros | Milinov Jewelry">
   <meta property="og:description" content="Joyas que cuentan una historia sutil. Conoce la esencia de Milinov Jewelry.">
-  <meta property="og:image" content="https://www.milinovjewelry.com/assets/banners/nosotros.jpg">
-  <meta property="og:url" content="https://www.milinovjewelry.com/nosotros.html">
+  <meta property="og:image" content="https://www.milinovjoyeria.com/assets/banners/nosotros.jpg">
+  <meta property="og:url" content="https://www.milinovjoyeria.com/nosotros.html">
   <meta property="og:locale" content="es_PE">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,29 +29,29 @@
     </div>
   </div>
 
-  <header class="header desktop-header">
-    <div class="container header-inner">
-      <nav class="nav" aria-label="Navegación principal">
-        <a href="index.html">Tienda</a>
-        <a href="catalogo.html">Catálogo</a>
-        <a href="nosotros.html" aria-current="page">Nosotros</a>
-        <a href="contacto.html">Contacto</a>
-      </nav>
-
-      <a class="logo" href="index.html">Milinov <span>Jewelry</span></a>
-
-      <div class="header-actions">
-        <input class="search-box" id="globalSearch" type="search" placeholder="Buscar joyas..." aria-label="Buscar joyas">
-        <button class="icon-btn" type="button" aria-label="Abrir carrito" data-open-cart>🛍<span class="cart-count" data-cart-count>0</span></button>
+  <header class="header">
+    <div class="container milinov-header">
+      <div class="store-left">
+        <button class="clean-icon menu-toggle" type="button" data-open-menu aria-label="Abrir menú"><i data-lucide="menu"></i></button>
+        <nav class="store-nav" aria-label="Navegación principal">
+          <a href="index.html">Tienda</a>
+          <a href="catalogo.html">Catálogo</a>
+          <a href="nosotros.html" aria-current="page">Nosotros</a>
+          <a href="contacto.html">Contacto</a>
+        </nav>
       </div>
-    </div>
-  </header>
-
-  <header class="header mobile-header">
-    <div class="container header-inner">
-      <button class="icon-btn" type="button" data-open-menu aria-label="Abrir menú">☰</button>
-      <a class="logo" href="index.html">Milinov <span>Jewelry</span></a>
-      <button class="icon-btn" type="button" data-open-cart aria-label="Abrir carrito">🛍<span class="cart-count" data-cart-count>0</span></button>
+      <a class="brand-logo" href="index.html" aria-label="Milinov Jewelry">
+        <span class="brand-mark">✦</span>
+        <strong>Milinov</strong>
+        <small>Jewelry</small>
+      </a>
+      <div class="header-tools">
+        <a class="clean-icon" href="catalogo.html" aria-label="Ir al catálogo"><i data-lucide="search"></i></a>
+        <button class="clean-icon" type="button" data-open-cart aria-label="Abrir carrito">
+          <i data-lucide="shopping-bag"></i>
+          <span class="cart-count" data-cart-count>0</span>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -88,7 +88,10 @@
           <p>Nuestro objetivo es que cada compra se sienta especial: desde la elección de la pieza hasta el empaque listo para regalar.</p>
           <a href="catalogo.html" class="btn btn-primary">Conocer catálogo</a>
         </div>
-        <img class="about-image" src="assets/banners/nosotros.jpg" alt="Pulsera de plata Milinov Jewelry" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='assets/placeholder.svg'">
+        <picture>
+          <source type="image/webp" srcset="assets/banners/nosotros.webp">
+          <img class="about-image" src="assets/banners/nosotros.jpg" alt="Pulsera de plata Milinov Jewelry" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='assets/placeholder.svg'">
+        </picture>
       </div>
     </section>
 
@@ -125,8 +128,11 @@
       <div>
         <h4>Contacto</h4>
         <a href="enlaces.html">Enlaces y redes</a>
+        <a href="terminos.html">Términos y Condiciones</a>
+        <a href="privacidad.html">Política de Privacidad</a>
+        <a href="reclamaciones.html">Libro de Reclamaciones</a>
         <a href="https://wa.me/51999999999" target="_blank" rel="noopener">WhatsApp</a>
-        <a href="mailto:hola@milinovjewelry.com">hola@milinovjewelry.com</a>
+        <a href="mailto:hola@milinovjoyeria.com">hola@milinovjoyeria.com</a>
         <p>Lima, Perú</p>
       </div>
     </div>
@@ -150,7 +156,9 @@
     </div>
   </aside>
 
+  <script src="https://unpkg.com/lucide@0.453.0/dist/umd/lucide.min.js" defer></script>
   <script src="js/config.js" defer></script>
+  <script src="js/analytics.js" defer></script>
   <script src="js/products.js" defer></script>
   <script src="js/cart.js" defer></script>
   <script src="js/app.js" defer></script>

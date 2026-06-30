@@ -5,6 +5,7 @@ Sitio web de **Milinov Jewelry**: joyas delicadas en **Plata 950** y **cobre con
 Hecho con **HTML + CSS + JavaScript vanilla** (sin frameworks ni build). Incluye un **backend local opcional** en Node.js para administrar inventario, precios y stock desde un panel visual.
 
 > Documentación técnica completa en [docs/DOCUMENTACION.md](docs/DOCUMENTACION.md).
+> Escalabilidad, portabilidad (sin lock-in) y seguridad en [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md).
 
 ---
 
@@ -12,14 +13,20 @@ Hecho con **HTML + CSS + JavaScript vanilla** (sin frameworks ni build). Incluye
 
 | Página | Qué es |
 |---|---|
-| [index.html](index.html) | **Portada / tienda principal** (fija): hero, secciones por material y destacados. Es lo primero que se ve al entrar |
-| [catalogo.html](catalogo.html) | Catálogo con búsqueda, filtros (categoría/material/colección) y orden por precio |
+| [index.html](index.html) | **Portada**: hero + las **2 secciones Mujer / Hombre**, destacados y testimonios |
+| [seccion.html](seccion.html) | Página de sección (`?genero=Mujer\|Hombre`): los **3 materiales** (Plata 950, Oro 18k, Reloj). Plata y Oro despliegan las categorías; Reloj va directo |
+| [catalogo.html](catalogo.html) | Catálogo con búsqueda y filtros (**género**/categoría/material/colección) + orden por precio |
 | [producto.html](producto.html) | Detalle de producto (`?id=N`), cantidad y compra por WhatsApp |
 | [nosotros.html](nosotros.html) | Historia y propuesta de la marca |
 | [contacto.html](contacto.html) | Formulario que abre WhatsApp con el mensaje listo |
 | [enlaces.html](enlaces.html) | Hub de enlaces tipo Linktree (redes + acceso a la tienda). Ideal para la **bio de Instagram** |
+| [terminos.html](terminos.html) | Términos y Condiciones (legal) |
+| [privacidad.html](privacidad.html) | Política de Privacidad — Ley 29733 (legal) |
+| [reclamaciones.html](reclamaciones.html) | **Libro de Reclamaciones** virtual (Indecopi), con formulario que envía por WhatsApp/correo |
 | [admin.html](admin.html) | **Panel local** de inventario (requiere el backend encendido) |
 | [404.html](404.html) | Página de error amigable |
+
+> ⚖️ **Antes de vender formalmente en Perú:** completa en las páginas legales tu **razón social** y **RUC** (busca `[RAZÓN SOCIAL]` y `[RUC]`). El Libro de Reclamaciones es exigible a comercios por Indecopi.
 
 > Antes había dos "portadas" (un Linktree y la tienda). Ahora la **tienda es la portada fija** (`index.html`) y el Linktree quedó como página aparte (`enlaces.html`) para usarlo en redes — así hay una sola tienda principal con URL única.
 
@@ -38,16 +45,21 @@ Abre <http://localhost:3001> — el mismo servidor sirve el sitio, el panel admi
 
 ## Configuración: lo primero que debes cambiar
 
-1. **Número de WhatsApp** — edita `whatsapp` en [js/config.js](js/config.js) (formato internacional sin `+`, ej. `51987654321`). Ese único cambio actualiza **todos** los botones y enlaces de WhatsApp del sitio.
-2. **Dominio real** — al publicar, reemplaza `www.milinovjewelry.com` por tu dominio en: [robots.txt](robots.txt), [sitemap.xml](sitemap.xml) y las etiquetas `<link rel="canonical">` / `og:` de cada HTML.
-3. **Correo y ciudad** — también en [js/config.js](js/config.js) y en los footers.
+Todo se edita en [js/config.js](js/config.js):
+
+1. **Número de WhatsApp** (`whatsapp`) — formato internacional sin `+`, ej. `51987654321`. ⚠️ Hoy está el placeholder `51999999999`: **cámbialo o los botones de compra abren un chat a un número falso.** Ese único cambio actualiza todos los botones y enlaces del sitio.
+2. **Banner de promo** (`promo.text`) — escribe un texto y aparece la franja superior en todas las páginas (ej. campañas de Día de la Madre, San Valentín, Navidad). Déjalo en `""` para ocultarlo.
+3. **Analítica** (`analytics.ga4` / `analytics.metaPixel`) — pega los IDs de Google Analytics 4 y del Píxel de Meta cuando los tengas. Mientras estén vacíos el sitio funciona igual; cuando los pongas, empieza a medir visitas, agregados al carrito y clics a WhatsApp. Detalle en [docs/DOCUMENTACION.md](docs/DOCUMENTACION.md).
+4. **Dominio real** — al publicar, reemplaza `www.milinovjoyeria.com` por tu dominio en: [robots.txt](robots.txt), [sitemap.xml](sitemap.xml) y las etiquetas `<link rel="canonical">` / `og:` de cada HTML.
+5. **Correo y ciudad** — también en [js/config.js](js/config.js) y en los footers.
 
 ## Administrar productos (precios, stock, fotos)
 
 1. Arranca el backend (`cd backend && npm start`).
 2. Abre <http://localhost:3001/admin.html>.
-3. Crea, edita o elimina joyas; sube fotos (JPG/PNG/WebP, máx. 5 MB) — quedan en `assets/uploads/`.
-4. Los cambios se guardan en `backend/data/products.json` y la tienda los muestra al instante (estados: Activo / Borrador / Agotado; los agotados se muestran con insignia y no se pueden agregar al carrito).
+3. Crea, edita o elimina joyas. Sube **varias fotos por pieza** (arrastra y suelta o elige; se **comprimen solas** en el navegador, así las fotos pesadas del celular ya no son problema). La primera foto es la portada; puedes marcar otra como portada o quitarlas.
+4. Atajos para llenar rápido: **Duplicar** una joya parecida, editar **precio y stock directo en la tabla**, e **Importar CSV** para cargar muchas de golpe (usa el botón "Plantilla CSV" para el formato). Campos extra opcionales: precio en oferta, etiqueta (Nuevo / Más vendido), medida, cuidados y "destacado".
+5. Los cambios se guardan en `backend/data/products.json` y la tienda los muestra al instante (estados: Activo / Borrador / Agotado; los agotados se muestran con insignia y no se pueden agregar al carrito).
 
 ### La tienda principal nunca se rompe al subir fotos
 

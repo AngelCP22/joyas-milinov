@@ -32,20 +32,71 @@ const SITE_ROOT = path.join(__dirname, "..");
    ============================================================ */
 
 async function readProducts() {
-  // Tolera BOM (byte order mark) si el JSON fue editado con Bloc de notas.
-  const raw = (await fs.readFile(DATA_FILE, "utf8")).replace(/^\uFEFF/, "");
-  return JSON.parse(raw);
+  let raw;
+  try {
+    // Tolera BOM (byte order mark) si el JSON fue editado con Bloc de notas.
+    raw = (await fs.readFile(DATA_FILE, "utf8")).replace(/^\uFEFF/, "");
+  } catch (error) {
+    // Primer arranque sin archivo: inventario vac\u00EDo (no es un error).
+    if (error.code === "ENOENT") return [];
+    throw error;
+  }
+  try {
+    return JSON.parse(raw);
+  } catch {
+    // El archivo existe pero est\u00E1 corrupto: error claro en vez de "no se pudo conectar".
+    throw new Error("products.json est\u00E1 corrupto (JSON inv\u00E1lido). Restaura una copia de seguridad.");
+  }
 }
 
 /**
  * Escritura atómica: se escribe a un archivo temporal y luego se renombra.
  * Así, si el proceso se interrumpe a mitad de escritura, products.json
- * nunca queda corrupto.
+ * nunca queda corrupto. Tras guardar, regenera el respaldo estático js/products.js.
  */
 async function writeProducts(products) {
   const tmpFile = `${DATA_FILE}.tmp`;
   await fs.writeFile(tmpFile, `${JSON.stringify(products, null, 2)}\n`, "utf8");
   await fs.rename(tmpFile, DATA_FILE);
+  await syncStaticCatalog(products);
+}
+
+const STATIC_CATALOG_FILE = path.join(SITE_ROOT, "js", "products.js");
+
+/** Serializa el catálogo al formato de js/products.js (respaldo de la tienda sin backend). */
+function buildStaticCatalog(products) {
+  const items = products.map(product => {
+    const fields = {
+      id: product.id, gender: product.gender, name: product.name, category: product.category,
+      collection: product.collection, material: product.material, price: product.price, oldPrice: product.oldPrice,
+      image: product.image, images: product.images, description: product.description,
+      stock: product.stock, status: product.status, badge: product.badge,
+      sizeMm: product.sizeMm, weightG: product.weightG, care: product.care,
+      warranty: product.warranty, featured: product.featured
+    };
+    const body = Object.entries(fields)
+      .filter(([, v]) => v !== "" && v !== null && v !== undefined && !(Array.isArray(v) && !v.length) && v !== false)
+      .map(([k, v]) => `    ${k}: ${JSON.stringify(v)}`)
+      .join(",\n");
+    return `  {\n${body}\n  }`;
+  }).join(",\n");
+  const header =
+    "/**\n" +
+    " * products.js — Catálogo estático de respaldo (GENERADO AUTOMÁTICAMENTE por el backend\n" +
+    " * al guardar en el admin). No editar a mano: se sobrescribe en cada cambio.\n" +
+    " * Es lo que ve la tienda publicada sin backend; súbelo junto con assets/uploads/.\n" +
+    " */\n";
+  // Neutraliza "</script>" por si el catálogo se incrustara inline algún día.
+  return `${header}const PRODUCTS = [\n${items}\n];\n`.replace(/<\/(script)/gi, "<\\/$1");
+}
+
+/** Regenera js/products.js para que la tienda estática quede sincronizada con el inventario. */
+async function syncStaticCatalog(products) {
+  try {
+    await fs.writeFile(STATIC_CATALOG_FILE, buildStaticCatalog(products), "utf8");
+  } catch (error) {
+    console.error("[milinov] no se pudo sincronizar js/products.js:", error.message);
+  }
 }
 
 /* ============================================================
@@ -95,16 +146,33 @@ function parseBody(req) {
    Subida de imágenes
    ============================================================ */
 
-/** Convierte cualquier nombre de archivo en un slug seguro y único. */
-function safeFilename(name) {
-  const ext = path.extname(name).toLowerCase().replace(/[^.\w]/g, "") || ".jpg";
-  const base = path.basename(name, ext).toLowerCase()
+// Extensión REAL derivada del tipo MIME validado (no del nombre del cliente),
+// para que nadie pueda guardar un .svg/.html disfrazado de imagen.
+const MIME_TO_EXT = { "image/png": ".png", "image/jpeg": ".jpg", "image/jpg": ".jpg", "image/webp": ".webp" };
+
+/** Verifica los magic bytes del archivo y devuelve su tipo real, o null. */
+function detectImageType(buffer) {
+  if (buffer.length < 12) return null;
+  if (buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4e && buffer[3] === 0x47) return "image/png";
+  if (buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) return "image/jpeg";
+  if (buffer.toString("ascii", 0, 4) === "RIFF" && buffer.toString("ascii", 8, 12) === "WEBP") return "image/webp";
+  return null;
+}
+
+/**
+ * Convierte el nombre original en un slug seguro y único. La extensión se pasa
+ * ya validada (derivada del MIME). Se añade entropía para que dos subidas en el
+ * mismo milisegundo no se sobrescriban.
+ */
+function safeFilename(name, ext) {
+  const base = path.basename(name, path.extname(name)).toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 48) || "joya";
-  return `${base}-${Date.now()}${ext}`;
+  const rand = Math.random().toString(36).slice(2, 7);
+  return `${base}-${Date.now()}-${rand}${ext}`;
 }
 
 async function saveUpload(input) {
@@ -122,8 +190,14 @@ async function saveUpload(input) {
     throw new Error("La imagen no debe superar 5 MB");
   }
 
+  // El contenido real (magic bytes) debe coincidir con una imagen permitida.
+  const realType = detectImageType(bytes);
+  if (!realType) {
+    throw new Error("El archivo no es una imagen válida (JPG, PNG o WEBP).");
+  }
+
   await fs.mkdir(UPLOAD_DIR, { recursive: true });
-  const filename = safeFilename(input.filename);
+  const filename = safeFilename(input.filename, MIME_TO_EXT[realType]);
   await fs.writeFile(path.join(UPLOAD_DIR, filename), bytes);
   return `assets/uploads/${filename}`;
 }
@@ -132,29 +206,85 @@ async function saveUpload(input) {
    Validación de productos
    ============================================================ */
 
+/** Convierte a número o devuelve null si no es un número válido (campo opcional). */
+function numOrNull(value, fallback = null) {
+  if (value === undefined) return fallback;
+  if (value === null || value === "") return null;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+/** Acepta solo rutas de imagen razonables: relativas a assets/ o URLs http(s) con extensión de imagen. */
+function isValidImagePath(value) {
+  if (typeof value !== "string") return false;
+  const v = value.trim();
+  if (!v || !/\.(jpe?g|png|webp|svg)$/i.test(v)) return false;
+  return v.startsWith("assets/") || /^https?:\/\//i.test(v);
+}
+
 function normalizeProduct(input, fallback = {}) {
+  const rawImages = Array.isArray(input.images)
+    ? input.images
+    : (Array.isArray(fallback.images) ? fallback.images : []);
+  // Solo se conservan rutas de imagen válidas (evita datos sucios o rutas fuera de assets/).
+  const images = rawImages.filter(isValidImagePath);
+  // La portada (image) es la primera válida de la galería.
+  const image = isValidImagePath(input.image) ? input.image.trim()
+    : (images[0] ?? (isValidImagePath(fallback.image) ? fallback.image : ""));
+  const gallery = image && !images.length ? [image] : images;
+
   return {
     ...fallback,
     sku: input.sku ?? fallback.sku ?? "",
+    gender: input.gender ?? fallback.gender ?? "",
     name: input.name ?? fallback.name ?? "",
     category: input.category ?? fallback.category ?? "",
     collection: input.collection ?? fallback.collection ?? "",
     model: input.model ?? fallback.model ?? "",
     material: input.material ?? fallback.material ?? "",
     price: Number(input.price ?? fallback.price ?? 0),
+    oldPrice: numOrNull(input.oldPrice, fallback.oldPrice ?? null),
     stock: Number(input.stock ?? fallback.stock ?? 0),
     status: input.status ?? fallback.status ?? "active",
-    image: input.image ?? fallback.image ?? "",
+    badge: input.badge ?? fallback.badge ?? "",
+    sizeMm: input.sizeMm ?? fallback.sizeMm ?? "",
+    weightG: numOrNull(input.weightG, fallback.weightG ?? null),
+    care: input.care ?? fallback.care ?? "",
+    warranty: input.warranty ?? fallback.warranty ?? "",
+    featured: input.featured !== undefined ? Boolean(input.featured) : Boolean(fallback.featured),
+    image,
+    images: gallery,
     description: input.description ?? fallback.description ?? ""
   };
 }
 
-function validateProduct(product) {
-  const missing = ["sku", "name", "category", "model"].filter(field => !String(product[field]).trim());
+/**
+ * Valida un producto ya normalizado. Recibe la lista actual para comprobar que
+ * el SKU sea único. 'model' NO es obligatorio (no se publica en la tienda;
+ * exigirlo rompía la edición en línea de productos que no lo tienen).
+ */
+function validateProduct(product, products = []) {
+  const missing = ["sku", "name", "category"].filter(field => !String(product[field] ?? "").trim());
   if (missing.length) return `Campos requeridos: ${missing.join(", ")}`;
-  if (!Number.isFinite(product.price) || product.price < 0) return "El precio debe ser un número mayor o igual a 0";
+  if (!["Hombre", "Mujer"].includes(product.gender)) return "Selecciona el género (Hombre o Mujer)";
+  if (String(product.name).length > 120) return "El nombre es demasiado largo (máximo 120 caracteres)";
+  if (String(product.description).length > 1000) return "La descripción es demasiado larga (máximo 1000 caracteres)";
+  if (!Number.isFinite(product.price) || product.price <= 0) return "El precio debe ser un número mayor que 0";
   if (!Number.isInteger(product.stock) || product.stock < 0) return "El stock debe ser un entero mayor o igual a 0";
   if (!["active", "draft", "sold_out"].includes(product.status)) return "Estado inválido";
+  if (product.oldPrice != null && (!Number.isFinite(product.oldPrice) || product.oldPrice <= product.price)) {
+    return "El precio anterior (oferta) debe ser mayor que el precio actual";
+  }
+  if (product.weightG != null && (!Number.isFinite(product.weightG) || product.weightG < 0)) {
+    return "El peso debe ser un número mayor o igual a 0";
+  }
+  if (product.status === "active" && (!Array.isArray(product.images) || !product.images.length)) {
+    return "Agrega al menos una imagen para publicar el producto (estado activo)";
+  }
+  const sku = String(product.sku).trim().toLowerCase();
+  if (products.some(p => p.id !== product.id && String(p.sku).trim().toLowerCase() === sku)) {
+    return `El SKU '${product.sku}' ya existe en otro producto`;
+  }
   return null;
 }
 
@@ -225,7 +355,7 @@ async function handleApi(req, res, url) {
     const product = normalizeProduct(input);
     product.id = products.reduce((max, item) => Math.max(max, item.id), 0) + 1;
 
-    const error = validateProduct(product);
+    const error = validateProduct(product, products);
     if (error) {
       send(res, 400, { error });
       return;
@@ -249,7 +379,7 @@ async function handleApi(req, res, url) {
     const product = normalizeProduct(input, products[index]);
     product.id = products[index].id;
 
-    const error = validateProduct(product);
+    const error = validateProduct(product, products);
     if (error) {
       send(res, 400, { error });
       return;
@@ -297,19 +427,28 @@ const MIME_TYPES = {
   ".webmanifest": "application/manifest+json"
 };
 
+// Cabeceras de seguridad para todas las respuestas estáticas (defensa en profundidad).
+const SECURITY_HEADERS = {
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "SAMEORIGIN",
+  "Referrer-Policy": "strict-origin-when-cross-origin"
+};
+
 async function serveStatic(req, res, url) {
   let pathname = decodeURIComponent(url.pathname);
   if (pathname === "/") pathname = "/index.html";
 
-  // Bloquea cualquier intento de salir de la carpeta del sitio (../../etc)
+  // Bloquea salir de la carpeta del sitio. Se compara con separador final para que
+  // un directorio HERMANO con prefijo igual (joyas-milinov-x) no pase el filtro.
+  const root = path.normalize(SITE_ROOT);
   const filePath = path.normalize(path.join(SITE_ROOT, pathname));
-  if (!filePath.startsWith(path.normalize(SITE_ROOT))) {
+  if (filePath !== root && !filePath.startsWith(root + path.sep)) {
     send(res, 403, { error: "Acceso denegado" });
     return;
   }
 
-  // No exponer la carpeta backend (datos e implementación) por HTTP
-  if (filePath.startsWith(path.join(SITE_ROOT, "backend"))) {
+  // No exponer la carpeta backend (datos e implementación) por HTTP.
+  if (filePath === path.join(SITE_ROOT, "backend") || filePath.startsWith(path.join(SITE_ROOT, "backend") + path.sep)) {
     send(res, 404, { error: "Ruta no encontrada" });
     return;
   }
@@ -319,6 +458,7 @@ async function serveStatic(req, res, url) {
   try {
     const data = await fs.readFile(filePath);
     res.writeHead(200, {
+      ...SECURITY_HEADERS,
       "Content-Type": MIME_TYPES[ext] || "application/octet-stream",
       // HTML siempre fresco; imágenes y estáticos cacheados por 1 hora en local
       "Cache-Control": ext === ".html" ? "no-cache" : "public, max-age=3600"
@@ -358,14 +498,28 @@ const server = http.createServer(async (req, res) => {
       send(res, 405, { error: "Método no permitido" });
     }
   } catch (error) {
-    send(res, 500, { error: error.message });
+    // Validaciones de negocio (400) ya respondieron antes; aquí solo caen errores
+    // inesperados: se registra el detalle en consola y al cliente va un mensaje genérico.
+    console.error("[milinov]", error);
+    if (!res.headersSent) send(res, 500, { error: "Error interno del servidor" });
   }
 });
 
-server.listen(PORT, () => {
-  console.log(`Milinov listo:`);
-  console.log(`  Sitio:  http://localhost:${PORT}`);
-  console.log(`  Tienda: http://localhost:${PORT}/`);
-  console.log(`  Admin:  http://localhost:${PORT}/admin.html`);
-  console.log(`  API:    http://localhost:${PORT}/api/products`);
-});
+// Bind explícito a loopback: el panel/API solo es accesible desde esta misma
+// máquina, nunca desde otros equipos de la red WiFi (no tiene autenticación).
+// Solo arranca el servidor si se ejecuta directamente (no al importarlo en tests).
+if (require.main === module) {
+  const HOST = process.env.HOST || "127.0.0.1";
+  server.listen(PORT, HOST, () => {
+    console.log(`Milinov listo (solo local, ${HOST}):`);
+    console.log(`  Sitio:  http://localhost:${PORT}/`);
+    console.log(`  Admin:  http://localhost:${PORT}/admin.html`);
+    console.log(`  API:    http://localhost:${PORT}/api/products`);
+  });
+}
+
+// Funciones puras expuestas para las pruebas (backend/test/).
+module.exports = {
+  validateProduct, normalizeProduct, isValidImagePath,
+  detectImageType, safeFilename, buildStaticCatalog
+};

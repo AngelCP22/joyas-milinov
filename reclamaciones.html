@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Libro de Reclamaciones | Milinov Jewelry</title>
+  <meta name="description" content="Libro de Reclamaciones virtual de Milinov Jewelry, conforme a la normativa de Indecopi (Perú).">
+  <meta name="theme-color" content="#FAF7F2">
+  <link rel="canonical" href="https://www.milinovjoyeria.com/reclamaciones.html">
+  <meta name="robots" content="all">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+  <div class="top-bar">
+    <div class="container">
+      <span>Envíos a todo el Perú</span>
+      <span>Empaque listo para regalar</span>
+    </div>
+  </div>
+
+  <header class="header">
+    <div class="container milinov-header">
+      <div class="store-left">
+        <button class="clean-icon menu-toggle" type="button" data-open-menu aria-label="Abrir menú"><i data-lucide="menu"></i></button>
+        <nav class="store-nav" aria-label="Navegación principal">
+          <a href="index.html">Tienda</a>
+          <a href="catalogo.html">Catálogo</a>
+          <a href="nosotros.html">Nosotros</a>
+          <a href="contacto.html">Contacto</a>
+        </nav>
+      </div>
+      <a class="brand-logo" href="index.html" aria-label="Milinov Jewelry">
+        <span class="brand-mark">✦</span>
+        <strong>Milinov</strong>
+        <small>Jewelry</small>
+      </a>
+      <div class="header-tools">
+        <a class="clean-icon" href="catalogo.html" aria-label="Ir al catálogo"><i data-lucide="search"></i></a>
+        <button class="clean-icon" type="button" data-open-cart aria-label="Abrir carrito">
+          <i data-lucide="shopping-bag"></i>
+          <span class="cart-count" data-cart-count>0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <aside class="mobile-menu" aria-label="Menú móvil">
+    <div class="mobile-menu-head">
+      <a class="brand-logo small" href="index.html"><strong>Milinov</strong><small>Jewelry</small></a>
+      <button class="close-btn" type="button" data-close-menu aria-label="Cerrar menú">×</button>
+    </div>
+    <nav>
+      <a href="index.html">Tienda</a>
+      <a href="catalogo.html">Catálogo</a>
+      <a href="nosotros.html">Nosotros</a>
+      <a href="contacto.html">Contacto</a>
+      <a href="enlaces.html">Enlaces y redes</a>
+      <a href="https://wa.me/51999999999" target="_blank" rel="noopener">WhatsApp</a>
+    </nav>
+  </aside>
+
+  <main id="contenido">
+    <section class="page-hero">
+      <div class="container">
+        <span class="eyebrow">Indecopi</span>
+        <h1>Libro de Reclamaciones</h1>
+        <p>Conforme al Código de Protección y Defensa del Consumidor (Ley 29571). Registra aquí tu queja o reclamo y te responderemos en un plazo máximo de 15 días hábiles.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="legal-doc">
+          <div class="note-card">
+            <strong>Reclamo:</strong> disconformidad relacionada con los productos o servicios.
+            <br><strong>Queja:</strong> malestar respecto a la atención al público, no vinculado a los productos.
+          </div>
+
+          <form class="reclamo-form" id="reclamoForm" novalidate>
+            <h2>1. Datos del consumidor</h2>
+            <div class="form-row">
+              <label>Nombre completo <input name="nombre" type="text" autocomplete="name" required></label>
+              <label>DNI / CE <input name="documento" type="text" inputmode="numeric" required></label>
+            </div>
+            <div class="form-row">
+              <label>Teléfono / WhatsApp <input name="telefono" type="tel" autocomplete="tel" required></label>
+              <label>Correo electrónico <input name="email" type="email" autocomplete="email" required></label>
+            </div>
+            <label>Domicilio <input name="domicilio" type="text" autocomplete="street-address"></label>
+
+            <h2>2. Identificación del bien contratado</h2>
+            <div class="form-row">
+              <label>Tipo
+                <select name="tipoBien">
+                  <option value="Producto">Producto</option>
+                  <option value="Servicio">Servicio</option>
+                </select>
+              </label>
+              <label>Monto reclamado (S/) <input name="monto" type="number" min="0" step="0.01"></label>
+            </div>
+            <label>N.° de pedido (si lo tienes) <input name="pedido" type="text"></label>
+            <label>Descripción del producto o servicio <textarea name="descripcionBien" rows="2"></textarea></label>
+
+            <h2>3. Detalle de la reclamación</h2>
+            <fieldset class="reclamo-tipo">
+              <legend>Tipo de solicitud</legend>
+              <label class="inline"><input type="radio" name="tipo" value="Reclamo" checked> Reclamo</label>
+              <label class="inline"><input type="radio" name="tipo" value="Queja"> Queja</label>
+            </fieldset>
+            <label>Detalle <textarea name="detalle" rows="4" required></textarea></label>
+            <label>Pedido del consumidor (qué solución esperas) <textarea name="pedidoConsumidor" rows="3" required></textarea></label>
+
+            <p class="legal-meta">Al enviar, se abrirá WhatsApp con tu hoja de reclamación lista para registrarla. También recibirás copia si nos das tu correo. Proveedor: <strong>[RAZÓN SOCIAL]</strong> · RUC <strong>[RUC]</strong>.</p>
+            <div class="admin-actions">
+              <button class="btn btn-whatsapp" type="submit">Enviar por WhatsApp</button>
+              <button class="btn btn-outline" type="button" id="reclamoEmail">Enviar por correo</button>
+            </div>
+            <p id="reclamoMsg" class="legal-meta" aria-live="polite"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div>
+        <h3 class="logo">Milinov <span>Jewelry</span></h3>
+        <p>Nadie es como tú y ese es tu poder. Joyas delicadas para elevar tu brillo diario.</p>
+      </div>
+      <div>
+        <h4>Tienda</h4>
+        <a href="catalogo.html">Catálogo</a>
+        <a href="nosotros.html">Nosotros</a>
+        <a href="contacto.html">Contacto</a>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <a href="terminos.html">Términos y Condiciones</a>
+        <a href="privacidad.html">Política de Privacidad</a>
+        <a href="reclamaciones.html">Libro de Reclamaciones</a>
+      </div>
+      <div>
+        <h4>Contacto</h4>
+        <a href="enlaces.html">Enlaces y redes</a>
+        <a href="https://wa.me/51999999999" target="_blank" rel="noopener">WhatsApp</a>
+        <a href="mailto:hola@milinovjoyeria.com">hola@milinovjoyeria.com</a>
+        <p>Lima, Perú</p>
+      </div>
+    </div>
+  </footer>
+
+  <div class="overlay"></div>
+
+  <aside class="cart-drawer" role="dialog" aria-label="Carrito de compras">
+    <div class="cart-head">
+      <strong>Tu carrito</strong>
+      <button class="close-btn" type="button" data-close-cart aria-label="Cerrar carrito">×</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-footer">
+      <div class="cart-footer-row"><span>Total</span><strong id="cartTotal">S/ 0.00</strong></div>
+      <button class="btn btn-primary" id="checkoutWhatsapp" type="button">Enviar pedido por WhatsApp</button>
+      <a href="catalogo.html" class="btn btn-outline">Seguir comprando</a>
+    </div>
+  </aside>
+
+  <script src="https://unpkg.com/lucide@0.453.0/dist/umd/lucide.min.js" defer></script>
+  <script src="js/config.js" defer></script>
+  <script src="js/analytics.js" defer></script>
+  <script src="js/products.js" defer></script>
+  <script src="js/cart.js" defer></script>
+  <script src="js/app.js" defer></script>
+</body>
+</html>

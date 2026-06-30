@@ -38,6 +38,78 @@ Esto significa que el **mismo código funciona en tres escenarios**: abierto com
 - La tienda principal queda **protegida** por diseño: el paso 3 del flujo solo reemplaza el catálogo si el backend responde con productos (`length > 0`). Si el backend está apagado, vacío o falla, la portada usa el respaldo `js/products.js` y nunca queda en blanco. Subir un producto solo **agrega** (POST con id incremental); no altera los existentes.
 - Para publicar **sin backend**, el admin tiene **"Exportar respaldo"**: descarga un `js/products.js` con el inventario actual. Reemplazas ese archivo en el hosting y la tienda pública refleja lo gestionado en el panel, sin depender del backend en línea.
 
+### Funciones de venta y panel (Fases 1 y 2)
+
+Implementado encima de la base anterior, sin frameworks:
+
+**Confianza y captación (Fase 1):** señales honestas (Yape/Plin/transferencia, envíos 24–72h, cambios 7 días, garantía) en portada y ficha; mensaje de pedido con material, N° de pedido y nombre/distrito; botón flotante de WhatsApp en todo el sitio; FAQ en Contacto; banner de promo editable (`config.js → promo`); analítica opcional GA4 + Píxel de Meta (`config.js → analytics`, eventos en `js/analytics.js`).
+
+**Ficha que vende (Fase 2):**
+- **Galería** de varias fotos por joya (`product.images[]`, la 1ª es portada) con miniaturas que cambian la foto principal; en la tarjeta, 2ª foto al pasar el mouse. Compatible hacia atrás: si solo hay `image`, se ve como antes.
+- **Badges** automáticos (Oferta / Nuevo / Más vendido / "Quedan N") y **precio con descuento** (tachado + % OFF) cuando hay `oldPrice`. Helpers `priceHtml()` y `productBadges()` en `config.js`.
+- **Datos de ficha** opcionales: medida (`sizeMm`), peso (`weightG`), cuidados (`care`), garantía (`warranty`) — renderizado condicional.
+- **Barra de compra fija** en móvil (`buildBuyBar` en `app.js`): precio + Agregar/Comprar siempre visibles; se oculta con `IntersectionObserver` cuando los botones de la ficha están en pantalla.
+- **Testimonios** estáticos en la portada (editar en `index.html`).
+- **Confirmación de pedido** en el carrito (`showOrderConfirm` en `cart.js`): tras abrir WhatsApp, deja un enlace de respaldo y "Copiar pedido" y **no vacía el carrito**.
+
+**Panel admin más potente (Fase 2):** subida de **varias fotos** con **compresión en el navegador** (canvas → máx. 1200 px → WebP, resuelve el límite de 5 MB), **arrastrar y soltar**, **duplicar** producto, **edición en línea** de precio y stock (PATCH al salir de la casilla), **importar CSV** (`parseCsv` + alta por fila) con **plantilla descargable**, y campos nuevos (oferta, etiqueta, medida, cuidados, destacado). El backend (`normalizeProduct`) acepta y guarda todos los campos nuevos.
+
+### Auditoría de ingeniería y correcciones (Fase 3)
+
+Tras una auditoría profunda (bugs, seguridad, validaciones, responsive, SOLID/DRY) con verificación
+adversarial, se aplicaron estas correcciones:
+
+**Backend (`server.js`)** — el endurecimiento más importante:
+- Escucha **solo en `127.0.0.1`** (loopback): el panel/API nunca queda accesible desde otros equipos de la red por descuido (configurable con `HOST`).
+- Subida de imágenes: la **extensión se deriva del tipo MIME validado** (no del nombre del cliente) y se verifican los **magic bytes** del archivo; nombres con entropía anti-colisión. Cierra el vector de "SVG con script disfrazado".
+- Cabeceras de seguridad en estáticos: `X-Content-Type-Options: nosniff`, `X-Frame-Options`, `Referrer-Policy`.
+- Errores 500 con mensaje **genérico** al cliente (detalle solo en consola del servidor).
+- `products.json` ausente → inventario vacío (primer arranque); corrupto → error claro.
+- Protección path-traversal comparando con separador final (no bloquea solo, ya no se cuela un directorio hermano con prefijo igual).
+- **Validación reforzada** (`validateProduct`): SKU único, precio > 0, `oldPrice` > precio, peso ≥ 0, imagen obligatoria si `status=active`, rutas de imagen válidas (solo `assets/` o `http(s)` con extensión de imagen), longitudes máximas. `model` dejó de ser obligatorio (no se publica y rompía la edición en línea).
+
+**Admin (`admin.js`)**: validación de precio/stock antes de enviar (no más "S/ 0.00" por descuido), edición en línea que revierte valores inválidos, **import CSV** que detecta el delimitador `;` (Excel es-PE), valida columnas y reporta errores **por fila**, deduplica SKU; "Duplicar" deja el SKU vacío para forzar uno único; guardas (`optional chaining`) para que el script no muera si cambia el HTML.
+
+**Tienda (`app.js`/`cart.js`/`config.js`)**: helper único `isSoldOut()` (elimina la lógica de "agotado" repetida en 4 sitios), `cart.js` reutiliza `money()`/`discountPct()` (DRY), `?id` inexistente muestra "no encontrado" en vez de otra joya, el flag **`featured`** ahora sí filtra los destacados de la portada, se corrige una fuga de `IntersectionObserver`, la promo se inserta sin pisar el `top-bar`, y el carrito se depura de productos eliminados.
+
+**CSS**: contrastes corregidos a **WCAG AA** (CTA del hero, kicker, dorado de textos/precios), objetivos táctiles ≥40–44 px en móvil, barra de compra con `safe-area` (notch) y espacio inferior reservado, y **eliminación de CSS muerto** (`.bottom-nav`, `.favorite-btn`, sistema `story-*`).
+
+**Veredicto SOLID** (honesto para este tamaño): se aplicó **SRP/DRY pragmático** (helpers compartidos, guardas, deduplicación de lógica). Un refactor a clases, contenedor de inyección de dependencias o bundler sería **sobre-ingeniería** para un sitio vanilla de ~6 páginas con una sola usuaria; el patrón `init*()` idempotente y la configuración central por `window.MILINOV` ya cumplen el rol.
+
+### Mejoras (Fase 4): legal, diseño unificado, respaldo automático, WebP
+
+- **Páginas legales (Perú):** `terminos.html`, `privacidad.html` (Ley 29733) y `reclamaciones.html` (Libro de Reclamaciones de Indecopi, con formulario que arma la hoja y la envía por WhatsApp o correo — `initReclamoForm()` en `app.js`). Enlazadas desde el footer de todas las páginas. Completar `[RAZÓN SOCIAL]` y `[RUC]`. **Aviso de cookies** (`initCookieBanner()`): solo aparece si hay analítica configurada; hasta aceptar, `analytics.js` **no** carga GA4/Meta (consentimiento real).
+- **Diseño unificado:** todas las páginas usan ahora el mismo **header premium** (logo centrado + íconos Lucide), eliminando los emojis 🛍/☰ de las páginas internas. Radios unificados vía tokens (`--radius-lg/md/sm` = 18/14/10) para un acabado consistente menos "burbuja".
+- **Respaldo automático:** el backend regenera `js/products.js` en cada guardado (`syncStaticCatalog()` dentro de `writeProducts()`), eliminando el paso manual de "Exportar respaldo" y el riesgo de precios desincronizados.
+- **Pruebas del backend:** `backend/test/server.test.js` con el runner nativo `node:test` (sin dependencias) cubre validación, normalización, rutas de imagen, magic bytes y nombres de archivo. Ejecutar: `cd backend && npm test`.
+- **Imágenes WebP:** las fotos de catálogo y banners tienen su `.webp` (≈50–85 % más livianas). El render usa `<picture>` con WebP + JPG de respaldo (helpers `picture()`/`bestSrc()` en `config.js`); el hero y los banners también. Para regenerar tras añadir fotos, reconvertir a WebP (p. ej. con un script de Pillow/Squoosh).
+
+### Estructura de navegación (Fase 5): Género → Material → Categoría
+
+A pedido de la clienta, la tienda se organiza en **tres niveles**:
+
+```
+Inicio (index.html)
+ └─ Mujer / Hombre            (seccion.html?genero=…)
+     ├─ Plata 950             → Aretes · Pulseras · Collares · Anillos
+     ├─ Cobre + enchape oro 18k → (mismas 4 categorías)
+     └─ Reloj                 → directo (categoría "Relojes", sin subdividir)
+                                  ↓
+                       catalogo.html?gender=…&material=…&category=…  (grilla de modelos)
+```
+
+- **Nuevo campo `gender`** (`"Hombre" | "Mujer"`) en cada producto. Es **obligatorio**: el backend (`validateProduct`) rechaza un producto sin género válido; el admin tiene un `<select>` Género; el CSV una columna `gender` (acepta mayúsc./minúsc.).
+- **Material `Reloj`** y **categoría `Relojes`** añadidas. Los relojes no se subdividen en aretes/anillos.
+- **`seccion.html`** es una sola página parametrizada por `?genero=`; `app.js → initSeccion()` pinta las 3 tarjetas de material con sus enlaces. Reutiliza el catálogo existente: cada enlace abre `catalogo.html` con `gender`/`material`/`category` en la URL.
+- **`catalogo.html`** ganó un filtro de **género** (`#genderFilter`) y un **título dinámico** (`#catalogTitle`, ej. "Collares de Plata 950 · Hombre"). `applyCatalogFilters()` filtra por género igual que por material/categoría.
+- **La clienta administra modelos y precios** desde `admin.html`: elige Género + Material + Categoría, escribe nombre y **precio**, sube fotos y guarda; el producto aparece solo en la sección que corresponde. Modelo de despliegue recomendado: admin local + publicar estático (hosting gratis).
+
+### Mejoras (Fase 6): pago en línea, Supabase y animaciones
+
+- **Carrito con doble opción** (`config.js → payments`): con `payments.enabled:false` (por defecto) el carrito muestra solo *"Enviar pedido por WhatsApp"* (publicable). Con `enabled:true` aparecen **"Pagar en línea"** + **"Pedir por WhatsApp"** (`injectCheckoutOptions()` en `app.js`). "Pagar en línea" abre `payments.checkoutUrl` (enlace de Mercado Pago/Izipay/Yape — **sin backend**) y muestra el total para enviar el comprobante por WhatsApp (`checkoutOnline()` en `cart.js`). El pedido por WhatsApp funciona siempre.
+- **Catálogo en línea con Supabase** (`config.js → supabase`): si pones `url` + `anonKey`, la tienda lee los productos de Supabase (`loadFromSupabase()` en `app.js`, carga el cliente oficial desde CDN bajo demanda y mapea columnas snake_case → claves de la tienda). Si está vacío, usa el backend local / catálogo estático (degradación elegante, verificada). Esquema, datos y guía en [`../backend/supabase/`](../backend/supabase/) (`schema.sql` con RLS, `seed.sql`, `README.md`). La `anon key` es pública por diseño; la seguridad la dan las políticas RLS (lectura pública solo de `active`, escritura solo autenticada). **Nunca** usar la `service_role` key en el frontend.
+- **Animaciones** (`initAnimations()` en `app.js`): aparición suave al hacer scroll (clase `.reveal` + `IntersectionObserver`) en secciones, tarjetas y testimonios. Respeta `prefers-reduced-motion` (si está activo, no oculta nada).
+
 ---
 
 ## 2. Archivos JavaScript

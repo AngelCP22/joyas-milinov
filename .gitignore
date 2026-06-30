@@ -9,3 +9,4 @@ node_modules/
 
 # Archivos temporales de la escritura atómica del backend
 backend/data/*.tmp
+backend/*.log
