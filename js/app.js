@@ -999,6 +999,14 @@ function injectWhatsappFab() {
   fab.setAttribute("aria-label", "Escríbenos por WhatsApp");
   fab.innerHTML = `<img src="assets/social/whatsapp.svg" alt="" aria-hidden="true">`;
   document.body.appendChild(fab);
+
+  const strip = qs(".whatsapp-strip");
+  if (strip && "IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => fab.classList.toggle("is-hidden", entry.isIntersecting));
+    }, { threshold: 0.2 });
+    observer.observe(strip);
+  }
 }
 
 /**

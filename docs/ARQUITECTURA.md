@@ -12,7 +12,7 @@ Nada depende de un proveedor propietario. Todo vive en **formatos y tecnologías
 
 | Capa | Tecnología | Portabilidad |
 |---|---|---|
-| **Sitio (frontend)** | HTML + CSS + JS vanilla, sin build | Corre en **cualquier** hosting estático (Netlify, Vercel, Cloudflare, cPanel…). Copiar/pegar archivos. |
+| **Sitio (frontend)** | HTML + CSS + JS vanilla + build de publicación | Corre en **cualquier** hosting estático. `npm run build` genera `dist/` sin archivos internos. |
 | **Base de datos** | **PostgreSQL** (Supabase ES Postgres estándar) | Se exporta con `pg_dump` y se importa en **cualquier** Postgres: Neon, Railway, RDS, un VPS propio, etc. |
 | **Fotos** | Archivos en Supabase Storage (S3 compatible) o en `assets/` | Descargables; se mueven a cualquier almacenamiento (S3, otro CDN, el propio hosting). |
 | **Respaldo del catálogo** | `products.json` + `js/products.js` autogenerados | Copia secundaria legible y versionable, independiente de la BD. |

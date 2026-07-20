@@ -75,7 +75,17 @@ El panel **gestiona todo** el inventario, pero la tienda principal está protegi
 
 ## Publicar el sitio (hosting estático)
 
-Sube el frontend completo, incluido `admin.html`, y excluye `backend/`, `assets/source-joyas/` y `assets/contact-sheet.jpg`. Puedes usar cualquier hosting estático (Netlify, Vercel, GitHub Pages, cPanel…). No hay paso de build. Detalle completo en [docs/DOCUMENTACION.md](docs/DOCUMENTACION.md).
+Usa el build seguro para publicar únicamente el frontend:
+
+```bash
+npm run build
+```
+
+El resultado queda en `dist/` y excluye automáticamente `backend/`, documentación interna, fotos originales y scripts de desarrollo.
+
+**Cloudflare Pages (recomendado):** conecta este repositorio, usa `main` como rama, `npm run build` como comando y `dist` como directorio de salida. **Vercel es una alternativa**, no un segundo paso: normalmente se elige Cloudflare Pages o Vercel para servir el mismo frontend.
+
+GitHub Pages ya publica `dist/` mediante `.github/workflows/pages.yml`. Detalle completo en [docs/DOCUMENTACION.md](docs/DOCUMENTACION.md).
 
 ## Estructura
 
@@ -93,6 +103,7 @@ Sube el frontend completo, incluido `admin.html`, y excluye `backend/`, `assets/
 │   └── admin.js            ← lógica del panel admin
 ├── assets/                 ← imágenes (products/, banners/, uploads/)
 ├── backend/                ← API + servidor local (Node, sin dependencias)
+├── scripts/                ← build y auditoría del paquete público
 ├── robots.txt, sitemap.xml ← SEO (cambiar dominio al publicar)
 └── docs/DOCUMENTACION.md   ← documentación técnica completa
 ```
