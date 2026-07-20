@@ -5,8 +5,8 @@ Guía de traspaso para retomar este proyecto sin contexto previo. Léela complet
 > **Estado al día (jun 2026) y rumbo decidido con la dueña:**
 > - **Top-bar unificado**: una sola franja crema premium en TODAS las páginas (antes el inicio era crema y las internas negras). Fuente única en la base `.top-bar` de `css/styles.css`.
 > - **Pagos = Yape y Plin (MVP, IMPLEMENTADO)**: en el carrito botones "Pagar con Yape" y "Pagar con Plin" (colores de marca) → panel con titular, número, QR opcional y total → "enviar comprobante por WhatsApp". Flujo genérico `checkoutWallet(kind)` en cart.js; config en `config.js → payments.yape` / `payments.plin` (poner números reales). Sin backend ni cuenta de comercio; confirmación manual del voucher. Automatizar (agregador Izipay/Culqi + webhook en Edge Function) es fase futura. Tarjeta vía enlace: `payments.checkoutUrl` (opcional, botón "Pagar con tarjeta").
-> - **Admin en tiempo real = Supabase**: la dueña quiere editar fotos/precio/stock y que el catálogo se actualice solo. Eso es Supabase (no el admin local Node, que exige republicar). Hoy ya funciona vía el **dashboard de Supabase** (Table Editor + Storage). **Próxima fase**: panel propio con login (Supabase Auth + Storage, fotos drag&drop) — requiere el proyecto Supabase de la dueña (URL + anon key) para construir y probar.
-> - "Automático" = aparece al recargar la tienda (sin republicar); para pestañas abiertas en vivo se añadiría Supabase Realtime (opcional).
+> - **Admin en tiempo real terminado**: `admin.html` ya usa Supabase Auth + Database + Storage, permite fotos drag&drop, precio y stock, y protege escritura con una lista de administradores. Falta pegar la URL + clave pública del proyecto real en `js/config.js` y ejecutar el SQL.
+> - **Automático** = los cambios se reflejan incluso en pestañas abiertas mediante Supabase Realtime; también se refresca al volver a la pestaña.
 
 ---
 
@@ -39,7 +39,7 @@ catalogo.html     Catálogo con filtros/búsqueda/orden
 producto.html     Ficha (?id=N): galería, precio/descuento, comprar por WhatsApp
 nosotros / contacto / enlaces(Linktree) / 404
 terminos / privacidad / reclamaciones   Legales Perú (Libro de Reclamaciones Indecopi)
-admin.html        Panel LOCAL de inventario (NO publicar)
+admin.html        Panel privado en línea (publicar; requiere login)
 css/styles.css    Estilos (secciones numeradas 1-10 en comentarios)
 js/config.js      ⚙️ Config central (window.MILINOV: whatsapp, promo, analytics, apiUrl)
                   + helpers: esc, money, whatsappUrl, isSoldOut, discountPct,
@@ -73,7 +73,7 @@ index.html → Mujer/Hombre → seccion.html?genero=… → 3 materiales
 ## 4-ter. Pagos, Supabase y animaciones (config.js)
 
 - **Pago**: `payments.enabled`+`checkoutUrl` (enlace Mercado Pago/Izipay/Yape, sin backend). Con `enabled:true` el carrito muestra "Pagar en línea" + "Pedir por WhatsApp". WhatsApp funciona siempre.
-- **Supabase** (opcional, catálogo en vivo): `supabase.url`+`anonKey` → `loadFromSupabase()` lee de Supabase; sin creds usa backend local/estático. Esquema/seed/guía en `backend/supabase/`. RLS: lectura pública de `active`, escritura solo autenticada; NUNCA usar la service_role key en el front.
+- **Supabase** (opcional, catálogo en vivo): `supabase.url`+`anonKey` → tienda y panel usan Supabase; sin creds usa backend local/estático. Esquema/seed/guía en `backend/supabase/`. RLS: lectura pública del catálogo; escritura solo para IDs de `admin_users`; NUNCA usar la service_role key en el front.
 - **Animaciones**: `initAnimations()` (clase `.reveal` + IntersectionObserver), respeta prefers-reduced-motion.
 
 ## 5. Cómo funciona (modelo mental)
@@ -96,13 +96,14 @@ Completado en 4 fases: optimización/responsive/SEO/accesibilidad; venta (WhatsA
 Tras una auditoría de producción (7 dimensiones, score 72/100), el DEV ya resolvió lo que no dependía de datos del dueño:
 - **Dominio alineado**: todo el sitio usa `https://www.milinovjoyeria.com` (antes `milinovjewelry.com`); email `hola@milinovjoyeria.com`. Decisión: **con www**.
 - **WhatsApp = fuente única confirmada**: `initWhatsappLinks()` (app.js) reescribe TODOS los `wa.me` desde `config.js` en cada página. Cambiar `config.js:12` arregla los ~23 enlaces. (El audit creyó que estaban hardcodeados; NO lo están en runtime.)
-- **`admin.html` blindado**: guard inline que, si se publica por error, NO renderiza el panel fuera de localhost/127.0.0.1/file (defensa en profundidad).
+- **`admin.html` privado**: publicado muestra login de Supabase; sin credenciales muestra la pantalla de configuración y nunca renderiza el inventario. En local mantiene compatibilidad con el backend Node.
 - **Cabeceras de seguridad para hosting estático**: `_headers` (Cloudflare Pages/Netlify) y `vercel.json` con CSP (default-src 'self', orígenes acotados: fonts, unpkg, jsdelivr, Supabase, GA4/Meta ya pre-permitidos), X-Frame-Options, nosniff, Referrer-Policy, y caché no-cache para html/js/css (sin hash en nombres).
 - **Bugs menores**: carrito avisa con toast si una pieza se agotó (no la borra en silencio); `stock` coaccionado a `Number` en la ruta Supabase; targets táctiles del header móvil a 44px (WCAG 2.5.5); `priceRange` del JSON-LD a `S/ 69 - S/ 219`.
+- **Fixes de UI (revisión de capturas 2026-06-29)**: (1) `picture > source { display:none }` global — con `picture{display:contents}`, el `<source>` se colaba como celda fantasma en grids/flex (rompía el `.gift-panel`, dejaba hueco y descuadraba imagen/texto). (2) `.cart-footer` heredaba `justify-content:space-between` de la regla compartida con `.cart-head`, encogiendo la columna del grid a ~201px (campos y botones angostos, placeholder "Distrito…" cortado) → se forzó `grid-template-columns:1fr`. (3) `.whatsapp-strip` tenía DOS enlaces (chevron `›` + botón verde) → se quitó el chevron, queda un solo CTA; en móvil ya no se oculta `.whatsapp-action`. El carrito ya suma en vivo con subtotal por línea (precio × cantidad) + total + contador.
 
 ## 6-ter. Colección de HOMBRE: fotos listas, faltan precios (2026-06-29)
 
-La dueña entregó fotos reales de una colección masculina (2 relojes Casio + cadenas de plata). Ya están **optimizadas** (JPG + WebP) en `assets/products/` y los **originales archivados** en `assets/source-joyas/*-original.jpg`. La tarjeta "Hombre" de la portada (`index.html`) ya usa `collar-cubano-grueso-plata`. **FALTA precio + stock** para cargarlas al catálogo (`js/products.js` + `backend/data/products.json` + `backend/supabase/seed.sql`). Mapeo ya decidido (todos género **Hombre**; nombres aprobados por la dueña):
+La dueña entregó fotos reales de una colección masculina (2 relojes Casio + cadenas de plata). Ya están **optimizadas** (JPG + WebP) en `assets/products/` y los **originales archivados** en `assets/source-joyas/*-original.jpg`. La tarjeta "Hombre" de la portada (`index.html`) ya usa `collar-cubano-grueso-plata`. **YA CARGADAS** en el catálogo (ids 11-18 en `js/products.js` + `backend/data/products.json` + `backend/supabase/seed.sql`), reemplazando los relojes de ejemplo. ⚠️ **PRECIOS Y STOCK SON TEMPORALES** (la dueña los corregirá): relojes 189/199; collares 280/390; pulseras 160/140/170/190; stock 5 en todos. Mapeo (todos género **Hombre**; nombres aprobados):
 
 | Foto base (assets/products/) | Producto | Material | Categoría |
 |---|---|---|---|
@@ -128,13 +129,13 @@ BLOQUEANTES de lanzamiento (sin esto NO se publica):
 ANTES DE PUBLICAR (no bloquean en desarrollo):
 4. **Crear el buzón** `hola@milinovjoyeria.com` (es el canal legal de contacto / derechos ARCO).
 5. **Comprar el dominio** `milinovjoyeria.com` y apuntarlo al hosting.
-6. **Precio + stock de los 8 productos de HOMBRE** (ver §6-ter): fotos ya listas, solo falta precio/stock para cargarlos al catálogo y reemplazar los relojes de ejemplo.
+6. **Corregir precios/stock de los 8 productos de HOMBRE** (ver §6-ter): ya están cargados y visibles, pero con precios/stock TEMPORALES que la dueña debe confirmar (editar en `js/products.js` + `backend/data/products.json` + `seed.sql`, o vía el panel admin).
 7. **Testimonios reales** en `index.html:165-191` (los actuales son de ejemplo; reseñas falsas = riesgo Indecopi).
 8. Resto del catálogo/fotos/precios definitivos de mujer si los hubiera.
 
 ## 8. Reglas y trampas
 
-- **NO publicar** `admin.html`, `js/admin.js`, la carpeta `backend/`, `assets/source-joyas/` ni `assets/contact-sheet.jpg` en el hosting público. La tienda pública es estática. (`admin.html` ya tiene un guard que evita que se ejecute fuera de local, pero igual NO conviene subirlo.)
+- **Publicar** `admin.html` y `js/admin.js`. **No publicar** la carpeta `backend/`, `assets/source-joyas/` ni `assets/contact-sheet.jpg`. La seguridad del panel depende de Auth + RLS, no de ocultar la URL.
 - **SÍ publicar** los archivos de hosting `_headers` (Cloudflare Pages/Netlify) y/o `vercel.json` (Vercel) — aplican CSP y cabeceras de seguridad en producción (en hosting estático no corre `server.js`, así que sin estos archivos el sitio iría sin cabeceras).
 - El backend **no tiene autenticación** (uso local); por eso escucha solo en `127.0.0.1`. Si alguna vez se expone, primero agregar token/HTTPS/CORS restringido/rate-limiting.
 - **Sobre SOLID:** se aplica DRY/SRP pragmático. NO meter clases/DI/bundler — sería sobre-ingeniería para este tamaño (ya documentado y decidido).

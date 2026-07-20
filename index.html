@@ -6,12 +6,12 @@
   <title>Milinov Jewelry | Tienda de joyas en Plata 950 y Oro 18k</title>
   <meta name="description" content="Tienda Milinov Jewelry: collares, anillos, aretes, pulseras y dijes en Plata 950 y cobre con enchape de oro 18k. Envíos a todo el Perú y empaque listo para regalar.">
   <meta name="theme-color" content="#FAF7F2">
-  <link rel="canonical" href="https://www.milinovjoyeria.com/">
+  <link rel="canonical" href="https://angelcp22.github.io/joyas-milinov/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Milinov Jewelry | Tienda de joyas">
   <meta property="og:description" content="Joyas delicadas en Plata 950 y enchape de oro 18k. Envíos a todo el Perú y empaque listo para regalar.">
-  <meta property="og:image" content="https://www.milinovjoyeria.com/assets/banners/hero-collar.jpg">
-  <meta property="og:url" content="https://www.milinovjoyeria.com/">
+  <meta property="og:image" content="https://angelcp22.github.io/joyas-milinov/assets/banners/hero-collar.jpg">
+  <meta property="og:url" content="https://angelcp22.github.io/joyas-milinov/">
   <meta property="og:locale" content="es_PE">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,19 +20,24 @@
   <link rel="stylesheet" href="css/styles.css">
   <!-- Precarga de la imagen principal del hero (mejora el LCP) -->
   <link rel="preload" as="image" href="assets/banners/hero-collar.webp" type="image/webp" fetchpriority="high">
-  <!-- Datos estructurados: joyería local (SEO) -->
+  <!-- Datos estructurados de la tienda y sus perfiles oficiales. -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "JewelryStore",
+    "@type": ["Organization", "OnlineStore"],
     "name": "Milinov Jewelry",
     "description": "Joyas delicadas en Plata 950 y cobre con enchape de oro 18k. Envíos a todo el Perú.",
-    "image": "https://www.milinovjoyeria.com/assets/banners/hero-collar.jpg",
-    "url": "https://www.milinovjoyeria.com/",
+    "image": "https://angelcp22.github.io/joyas-milinov/assets/banners/hero-collar.jpg",
+    "url": "https://angelcp22.github.io/joyas-milinov/",
     "email": "hola@milinovjoyeria.com",
     "address": { "@type": "PostalAddress", "addressLocality": "Lima", "addressCountry": "PE" },
     "currenciesAccepted": "PEN",
-    "priceRange": "S/ 69 - S/ 219"
+    "telephone": "+51 965 224 616",
+    "sameAs": [
+      "https://www.instagram.com/milinov_joyas/",
+      "https://www.instagram.com/milinovjoyas_men/",
+      "https://www.tiktok.com/@geral.milinov"
+    ]
   }
   </script>
 </head>
@@ -86,7 +91,7 @@
       <a href="nosotros.html">Nosotros</a>
       <a href="contacto.html">Contacto</a>
       <a href="enlaces.html">Enlaces y redes</a>
-      <a href="https://wa.me/51999999999" target="_blank" rel="noopener">WhatsApp</a>
+      <a href="https://wa.me/51965224616" target="_blank" rel="noopener">WhatsApp</a>
     </nav>
   </aside>
 
@@ -161,31 +166,32 @@
       </div>
     </section>
 
-    <!-- TESTIMONIOS: reemplaza estos textos y nombres por reseñas reales de tus clientas
-         (puedes pedirlas por WhatsApp tras la entrega). Para agregar/quitar, copia o borra un <article>. -->
-    <section class="section testimonials">
+    <section class="section purchase-guide" aria-labelledby="como-comprar">
       <div class="container">
         <div class="section-title">
           <div>
-            <span class="eyebrow">Clientas felices</span>
-            <h2>Lo que dicen de Milinov</h2>
+            <span class="eyebrow">Compra acompañada</span>
+            <h2 id="como-comprar">Tu pedido en tres pasos</h2>
           </div>
         </div>
-        <div class="testimonial-grid">
-          <article class="testimonial">
-            <div class="stars" aria-label="5 de 5 estrellas">★★★★★</div>
-            <p>"La calidad es hermosa y llegó en un empaque precioso, listo para regalar. Mi mamá quedó encantada."</p>
-            <span class="testimonial-author"><span class="avatar">A</span> Andrea R. · Lima</span>
+        <div class="purchase-steps">
+          <article class="purchase-step">
+            <span>01</span>
+            <i data-lucide="search"></i>
+            <h3>Elige tu joya</h3>
+            <p>Filtra por material, categoría o colección y revisa el stock disponible.</p>
           </article>
-          <article class="testimonial">
-            <div class="stars" aria-label="5 de 5 estrellas">★★★★★</div>
-            <p>"Súper atentas por WhatsApp y me ayudaron a elegir. El collar es delicado y elegante, lo uso todos los días."</p>
-            <span class="testimonial-author"><span class="avatar">C</span> Camila V. · Arequipa</span>
+          <article class="purchase-step">
+            <span>02</span>
+            <img src="assets/social/whatsapp.svg" alt="" aria-hidden="true" loading="lazy">
+            <h3>Confirma por WhatsApp</h3>
+            <p>Envía tu carrito y coordinamos contigo el pago, la entrega y la dedicatoria.</p>
           </article>
-          <article class="testimonial">
-            <div class="stars" aria-label="5 de 5 estrellas">★★★★★</div>
-            <p>"Compré unos aretes de plata y son tal cual la foto. Llegó rápido a provincia. Volveré a comprar."</p>
-            <span class="testimonial-author"><span class="avatar">M</span> Melissa T. · Trujillo</span>
+          <article class="purchase-step">
+            <span>03</span>
+            <i data-lucide="gift"></i>
+            <h3>Recibe tu pedido</h3>
+            <p>Tu joya sale protegida y en empaque listo para regalar.</p>
           </article>
         </div>
       </div>
@@ -194,8 +200,7 @@
     <section class="container whatsapp-strip">
       <span class="whatsapp-badge"><img src="assets/social/whatsapp.svg" alt="" aria-hidden="true" loading="lazy"></span>
       <p>¿Tienes dudas o quieres hacer un pedido?<strong> Escríbenos por WhatsApp</strong></p>
-      <a href="https://wa.me/51999999999" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp"><i data-lucide="chevron-right"></i></a>
-      <a class="whatsapp-action" href="https://wa.me/51999999999" target="_blank" rel="noopener" aria-label="WhatsApp">
+      <a class="whatsapp-action" href="https://wa.me/51965224616" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp">
         <img src="assets/social/whatsapp.svg" alt="" aria-hidden="true" loading="lazy">
       </a>
     </section>
@@ -236,7 +241,7 @@
         <a href="terminos.html">Términos y Condiciones</a>
         <a href="privacidad.html">Política de Privacidad</a>
         <a href="reclamaciones.html">Libro de Reclamaciones</a>
-        <a href="https://wa.me/51999999999" target="_blank" rel="noopener">WhatsApp</a>
+        <a href="https://wa.me/51965224616" target="_blank" rel="noopener">WhatsApp</a>
         <a href="mailto:hola@milinovjoyeria.com">hola@milinovjoyeria.com</a>
         <p>Lima, Perú</p>
       </div>

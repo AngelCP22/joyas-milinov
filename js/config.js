@@ -15,6 +15,7 @@ window.MILINOV = {
   brand: "Milinov Jewelry",
   email: "hola@milinovjoyeria.com",
   city: "Lima, Perú",
+  siteUrl: "https://angelcp22.github.io/joyas-milinov/",
 
   /**
    * Banner de promoción (franja superior). Editable sin tocar el resto del sitio.
@@ -71,15 +72,15 @@ window.MILINOV = {
 
   /**
    * Base de datos en línea (Supabase). Catálogo en vivo: si pones aquí la URL y
-   * la anon key de tu proyecto, la tienda lee los productos de Supabase (y los
-   * editas desde el panel de Supabase, sin republicar). Si están vacías, la
+   * la clave pública de tu proyecto, la tienda lee los productos de Supabase y
+   * admin.html permite editarlos con login, sin republicar. Si están vacías, la
    * tienda usa el backend local / el catálogo estático, como hasta ahora.
    * La anon key es pública por diseño; la seguridad la dan las políticas RLS
    * (ver backend/supabase/schema.sql). NO pongas aquí la "service_role" key.
    */
   supabase: {
     url: "",        // https://TUPROYECTO.supabase.co
-    anonKey: ""     // clave pública "anon"
+    anonKey: ""     // clave pública "publishable" o la antigua "anon"
   },
 
   /**
@@ -123,6 +124,11 @@ function money(value) {
 function whatsappUrl(encodedText = "") {
   const base = `https://wa.me/${window.MILINOV.whatsapp}`;
   return encodedText ? `${base}?text=${encodedText}` : base;
+}
+
+/** URL pública absoluta para metadatos y datos estructurados. */
+function absoluteSiteUrl(path = "") {
+  return new URL(path, window.MILINOV.siteUrl).href;
 }
 
 /**

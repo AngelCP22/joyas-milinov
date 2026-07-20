@@ -102,12 +102,12 @@ Inicio (index.html)
 - **Material `Reloj`** y **categoría `Relojes`** añadidas. Los relojes no se subdividen en aretes/anillos.
 - **`seccion.html`** es una sola página parametrizada por `?genero=`; `app.js → initSeccion()` pinta las 3 tarjetas de material con sus enlaces. Reutiliza el catálogo existente: cada enlace abre `catalogo.html` con `gender`/`material`/`category` en la URL.
 - **`catalogo.html`** ganó un filtro de **género** (`#genderFilter`) y un **título dinámico** (`#catalogTitle`, ej. "Collares de Plata 950 · Hombre"). `applyCatalogFilters()` filtra por género igual que por material/categoría.
-- **La clienta administra modelos y precios** desde `admin.html`: elige Género + Material + Categoría, escribe nombre y **precio**, sube fotos y guarda; el producto aparece solo en la sección que corresponde. Modelo de despliegue recomendado: admin local + publicar estático (hosting gratis).
+- **La clienta administra modelos y precios** desde `admin.html`: inicia sesión, elige Género + Material + Categoría, escribe nombre y **precio**, sube fotos y guarda; el producto aparece solo en la sección que corresponde. Supabase guarda y sincroniza el inventario en línea.
 
 ### Mejoras (Fase 6): pago en línea, Supabase y animaciones
 
 - **Carrito con doble opción** (`config.js → payments`): con `payments.enabled:false` (por defecto) el carrito muestra solo *"Enviar pedido por WhatsApp"* (publicable). Con `enabled:true` aparecen **"Pagar en línea"** + **"Pedir por WhatsApp"** (`injectCheckoutOptions()` en `app.js`). "Pagar en línea" abre `payments.checkoutUrl` (enlace de Mercado Pago/Izipay/Yape — **sin backend**) y muestra el total para enviar el comprobante por WhatsApp (`checkoutOnline()` en `cart.js`). El pedido por WhatsApp funciona siempre.
-- **Catálogo en línea con Supabase** (`config.js → supabase`): si pones `url` + `anonKey`, la tienda lee los productos de Supabase (`loadFromSupabase()` en `app.js`, carga el cliente oficial desde CDN bajo demanda y mapea columnas snake_case → claves de la tienda). Si está vacío, usa el backend local / catálogo estático (degradación elegante, verificada). Esquema, datos y guía en [`../backend/supabase/`](../backend/supabase/) (`schema.sql` con RLS, `seed.sql`, `README.md`). La `anon key` es pública por diseño; la seguridad la dan las políticas RLS (lectura pública solo de `active`, escritura solo autenticada). **Nunca** usar la `service_role` key en el frontend.
+- **Catálogo y panel en línea con Supabase** (`config.js → supabase`): con `url` + clave pública, la tienda lee productos y `admin.html` usa Auth, Database, Storage y Realtime. Si está vacío, usa el backend local / catálogo estático. El SQL aplica RLS: lectura pública del catálogo y escritura solo para usuarios de `admin_users`. **Nunca** usar la `service_role` key en el frontend.
 - **Animaciones** (`initAnimations()` en `app.js`): aparición suave al hacer scroll (clase `.reveal` + `IntersectionObserver`) en secciones, tarjetas y testimonios. Respeta `prefers-reduced-motion` (si está activo, no oculta nada).
 
 ---
@@ -145,7 +145,7 @@ Cada `init*()` se autodetecta por página (si no encuentra sus elementos, no hac
 | `hydrateProductsFromApi` | todas | Hidratación no bloqueante desde el backend (ver flujo arriba) |
 
 ### js/admin.js — Panel de inventario
-CRUD contra el API + subida de imágenes (se convierten a base64 en el navegador y el backend las guarda en `assets/uploads/`). Solo se usa en `admin.html`.
+`admin.html` usa CRUD contra Supabase y sube imágenes a Storage cuando hay credenciales. En desarrollo conserva el API local: las imágenes se convierten a base64 y Node las guarda en `assets/uploads/`.
 
 ---
 
@@ -209,7 +209,7 @@ Servidor HTTP nativo de Node, **sin dependencias**. Hace dos cosas:
 
 **Sincronizar la tienda pública con el admin** → en el panel pulsa "Exportar respaldo" → reemplaza el `js/products.js` descargado en tu hosting y sube las fotos nuevas de `assets/uploads/`. La portada pública mostrará lo mismo que el admin, sin backend en línea.
 
-**Publicar** → subir todo menos `backend/`, `admin.html`, `assets/source-joyas/`, `assets/contact-sheet.jpg` (sí se sube `enlaces.html`). Cambiar dominio en `robots.txt`, `sitemap.xml` y los `canonical`/`og:` de cada HTML. Verificar el número de WhatsApp real en `js/config.js`. Para la bio de Instagram, usa la URL de `enlaces.html`.
+**Publicar** → subir el frontend incluido `admin.html`; excluir `backend/`, `assets/source-joyas/` y `assets/contact-sheet.jpg`. Cambiar dominio en `robots.txt`, `sitemap.xml` y los `canonical`/`og:` de cada HTML. Verificar el número de WhatsApp real en `js/config.js`. Para la bio de Instagram, usa la URL de `enlaces.html`.
 
 ---
 
@@ -223,7 +223,7 @@ joyas-milinov/
 ├── producto.html           Detalle (?id=N)
 ├── nosotros.html           Sobre la marca
 ├── contacto.html           Formulario → WhatsApp
-├── admin.html              Panel local de inventario (NO publicar)
+├── admin.html              Panel privado de inventario (Supabase Auth)
 ├── 404.html                Error amigable
 ├── robots.txt              SEO (cambiar dominio)
 ├── sitemap.xml             SEO (cambiar dominio)

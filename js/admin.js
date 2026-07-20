@@ -1,14 +1,11 @@
 /**
- * admin.js — Panel de inventario (admin.html).
- *
- * Herramienta de uso LOCAL: habla con el backend de backend/server.js
- * (sin autenticación) para crear, editar y eliminar productos, subir varias
- * fotos por joya (se comprimen en el navegador) e importar por CSV.
- * No publicar admin.html en un hosting público.
- *
- * Depende de: config.js (esc, money, apiUrl).
+ * Panel de inventario. En producción usa Supabase Auth, Database y Storage;
+ * en localhost conserva el backend Node como modo de desarrollo.
  */
 const API_URL = window.MILINOV?.apiUrl || "http://localhost:3001/api";
+const SUPABASE_CONFIG = window.MILINOV?.supabase || {};
+const IS_LOCAL = location.protocol === "file:" || ["localhost", "127.0.0.1", "::1", ""].includes(location.hostname);
+const HAS_SUPABASE = Boolean(SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey && window.supabase);
 
 const form = document.querySelector("#productForm");
 const tableBody = document.querySelector("#adminProducts");
@@ -18,15 +15,50 @@ const imagePath = document.querySelector("#imagePath");
 const thumbsBox = document.querySelector("#adminThumbs");
 const dropzone = document.querySelector("#dropzone");
 const csvFile = document.querySelector("#csvFile");
+const loginView = document.querySelector("#adminLogin");
+const setupView = document.querySelector("#adminSetup");
+const appView = document.querySelector("#adminApp");
+const loginForm = document.querySelector("#adminLoginForm");
+const authStatus = document.querySelector("#adminAuthStatus");
+const identityNode = document.querySelector("#adminIdentity");
+const logoutButton = document.querySelector("#adminLogout");
 
 let products = [];
-let selectedImages = []; // rutas de las fotos del producto en edición (la 1ª es portada)
+let selectedImages = [];
+let db = null;
+let dataMode = "local";
+let realtimeChannel = null;
 
 function moneyAdmin(value) {
   return typeof money === "function" ? money(value) : `S/ ${Number(value).toFixed(2)}`;
 }
 
-async function request(path, options = {}) {
+function fromDatabase(row) {
+  return {
+    ...row,
+    oldPrice: row.old_price ?? null,
+    sizeMm: row.size_mm ?? "",
+    weightG: row.weight_g ?? null,
+    images: Array.isArray(row.images) ? row.images : [],
+    stock: Number(row.stock),
+    price: Number(row.price),
+    featured: Boolean(row.featured)
+  };
+}
+
+function toDatabase(product) {
+  const payload = { ...product };
+  if ("oldPrice" in payload) payload.old_price = payload.oldPrice;
+  if ("sizeMm" in payload) payload.size_mm = payload.sizeMm;
+  if ("weightG" in payload) payload.weight_g = payload.weightG;
+  delete payload.oldPrice;
+  delete payload.sizeMm;
+  delete payload.weightG;
+  delete payload.id;
+  return payload;
+}
+
+async function localRequest(path, options = {}) {
   const response = await fetch(`${API_URL}${path}`, {
     headers: { "Content-Type": "application/json" },
     ...options
@@ -34,6 +66,28 @@ async function request(path, options = {}) {
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || "Error de API");
   return data;
+}
+
+async function request(path, options = {}) {
+  if (dataMode === "local") return localRequest(path, options);
+
+  const method = (options.method || "GET").toUpperCase();
+  const body = options.body ? JSON.parse(options.body) : null;
+  const match = path.match(/^\/products(?:\/(\d+))?$/);
+  if (!match) throw new Error("Operación no disponible");
+
+  const id = match[1] ? Number(match[1]) : null;
+  let query;
+  if (method === "GET" && !id) query = db.from("products").select("*").order("id");
+  else if (method === "POST" && !id) query = db.from("products").insert(toDatabase(body)).select().single();
+  else if (method === "PATCH" && id) query = db.from("products").update(toDatabase(body)).eq("id", id).select().single();
+  else if (method === "DELETE" && id) query = db.from("products").delete().eq("id", id).select().single();
+  else throw new Error("Operación no disponible");
+
+  const { data, error } = await query;
+  if (error) throw new Error(error.message);
+  if (Array.isArray(data)) return data.map(fromDatabase);
+  return data ? fromDatabase(data) : data;
 }
 
 function setStatus(message) {
@@ -82,6 +136,23 @@ function compressImage(file, maxSize = 1200, quality = 0.82) {
 
 async function uploadImage(file) {
   const { dataUrl, name } = await compressImage(file);
+  if (dataMode === "supabase") {
+    const blob = await fetch(dataUrl).then(response => response.blob());
+    const extension = blob.type === "image/webp" ? "webp" : "jpg";
+    const safeBase = name.replace(/\.[^.]+$/, "").normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9-]+/gi, "-")
+      .replace(/^-+|-+$/g, "").toLowerCase() || "joya";
+    const { data: userData } = await db.auth.getUser();
+    const unique = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const path = `${userData.user.id}/${safeBase}-${unique}.${extension}`;
+    const { error } = await db.storage.from("productos").upload(path, blob, {
+      contentType: blob.type,
+      cacheControl: "31536000",
+      upsert: false
+    });
+    if (error) throw new Error(`No se pudo subir la foto: ${error.message}`);
+    return db.storage.from("productos").getPublicUrl(path).data.publicUrl;
+  }
   const result = await request("/uploads", {
     method: "POST",
     body: JSON.stringify({ filename: name, dataUrl })
@@ -222,8 +293,10 @@ function renderProducts() {
   tableBody.innerHTML = products.map(product => `
     <tr data-id="${Number(product.id)}">
       <td>
-        <strong>${esc(product.name)}</strong>
-        <small>${esc(product.sku)} · ${esc(product.model)}</small>
+        <span class="admin-product-cell">
+          <img src="${esc(product.image || "assets/placeholder.svg")}" alt="" loading="lazy" onerror="this.src='assets/placeholder.svg'">
+          <span><strong>${esc(product.name)}</strong><small>${esc(product.sku)} · ${esc(product.model)}</small></span>
+        </span>
       </td>
       <td>${esc(product.category)}</td>
       <td><input class="cell-edit" type="number" min="0" step="0.01" value="${Number(product.price)}" data-field="price" aria-label="Precio"></td>
@@ -244,11 +317,8 @@ async function loadProducts() {
     renderProducts();
     setStatus(`${products.length} productos cargados`);
   } catch (error) {
-    // fetch lanza TypeError si el servidor no responde (backend apagado);
-    // si el servidor SÍ responde con error (p. ej. products.json corrupto),
-    // se muestra ese mensaje real en vez del genérico de "arranca el backend".
-    const sinConexion = error instanceof TypeError;
-    setStatus(sinConexion ? "No se pudo conectar. Ejecuta: cd backend && npm start" : error.message);
+    const sinConexionLocal = dataMode === "local" && error instanceof TypeError;
+    setStatus(sinConexionLocal ? "No se pudo conectar. Ejecuta: cd backend && npm start" : error.message);
   }
 }
 
@@ -272,7 +342,11 @@ tableBody?.addEventListener("change", async event => {
   }
 
   try {
-    await request(`/products/${id}`, { method: "PATCH", body: JSON.stringify({ [field]: value }) });
+    const current = products.find(product => product.id === Number(id));
+    const changes = { [field]: value };
+    if (field === "stock" && value === 0) changes.status = "sold_out";
+    if (field === "stock" && value > 0 && current?.status === "sold_out") changes.status = "active";
+    await request(`/products/${id}`, { method: "PATCH", body: JSON.stringify(changes) });
     setStatus(`Actualizado: ${field === "price" ? "precio" : "stock"}`);
     await loadProducts();
   } catch (error) {
@@ -327,6 +401,7 @@ form?.addEventListener("submit", async event => {
       setStatus("El stock debe ser un número entero (0 o más)");
       return;
     }
+    if (product.stock === 0) product.status = "sold_out";
     if (!product.images.length) {
       setStatus("Agrega al menos una foto");
       return;
@@ -508,6 +583,95 @@ function triggerDownload(blob, filename) {
 }
 
 /* ============================================================
+   Acceso al panel y sincronización en tiempo real
+   ============================================================ */
+
+function showOnly(view) {
+  [loginView, setupView, appView].forEach(node => {
+    if (node) node.hidden = node !== view;
+  });
+}
+
+async function openOnlineAdmin(user) {
+  const { data, error } = await db.from("admin_users")
+    .select("user_id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (error || !data) {
+    showOnly(loginView);
+    authStatus.textContent = "Esta cuenta no tiene permiso para administrar la tienda.";
+    return false;
+  }
+
+  dataMode = "supabase";
+  showOnly(appView);
+  identityNode.textContent = user.email || "Cuenta administradora";
+  logoutButton.hidden = false;
+  await loadProducts();
+  subscribeToInventory();
+  return true;
+}
+
+function subscribeToInventory() {
+  if (!db || realtimeChannel) return;
+  let refreshTimer;
+  realtimeChannel = db.channel("admin-products-live")
+    .on("postgres_changes", { event: "*", schema: "public", table: "products" }, () => {
+      clearTimeout(refreshTimer);
+      refreshTimer = setTimeout(loadProducts, 150);
+    })
+    .subscribe();
+}
+
+loginForm?.addEventListener("submit", async event => {
+  event.preventDefault();
+  authStatus.textContent = "Verificando acceso...";
+  const data = new FormData(loginForm);
+  const { data: signed, error } = await db.auth.signInWithPassword({
+    email: String(data.get("email") || "").trim(),
+    password: String(data.get("password") || "")
+  });
+  if (error) {
+    authStatus.textContent = "Correo o contraseña incorrectos.";
+    return;
+  }
+  authStatus.textContent = "";
+  await openOnlineAdmin(signed.user);
+});
+
+logoutButton?.addEventListener("click", async () => {
+  if (realtimeChannel) await db.removeChannel(realtimeChannel);
+  realtimeChannel = null;
+  await db.auth.signOut();
+  loginForm.reset();
+  showOnly(loginView);
+  authStatus.textContent = "Sesión cerrada.";
+});
+
+async function initAdmin() {
+  renderThumbs();
+
+  if (HAS_SUPABASE) {
+    db = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+    const { data: { session } } = await db.auth.getSession();
+    if (session?.user) await openOnlineAdmin(session.user);
+    else showOnly(loginView);
+    return;
+  }
+
+  if (IS_LOCAL) {
+    dataMode = "local";
+    showOnly(appView);
+    identityNode.textContent = "Modo local";
+    await loadProducts();
+    return;
+  }
+
+  showOnly(setupView);
+}
+
+/* ============================================================
    Listeners de la barra de acciones
    ============================================================ */
 
@@ -523,8 +687,4 @@ csvFile?.addEventListener("change", () => {
   csvFile.value = "";
 });
 
-// Arranque solo si estamos realmente en el panel admin.
-if (form && tableBody) {
-  renderThumbs();
-  loadProducts();
-}
+if (form && tableBody) initAdmin();

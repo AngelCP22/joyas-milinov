@@ -2,46 +2,57 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <!-- Blindaje de seguridad: este panel NO tiene contraseña y es solo para uso local.
-       Si por error se publicara en un hosting, este guard impide que se renderice en
-       internet (defensa en profundidad: no depende de recordar excluir el archivo). -->
-  <script>
-    (function () {
-      var h = location.hostname;
-      var local = location.protocol === "file:" || h === "localhost" || h === "127.0.0.1" || h === "::1" || h === "";
-      if (!local) {
-        document.documentElement.innerHTML =
-          '<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">' +
-          '<meta name="robots" content="noindex, nofollow"><title>Panel no disponible</title></head>' +
-          '<body style="font-family:system-ui,Segoe UI,sans-serif;text-align:center;padding:4rem 1.5rem;color:#5f554f;background:#faf7f2">' +
-          '<h1 style="font-weight:600;font-size:1.4rem">Panel administrativo</h1>' +
-          '<p style="max-width:34rem;margin:1rem auto;line-height:1.6">Este panel solo está disponible de forma local, en la computadora de la tienda. Por seguridad no se ejecuta en internet.</p>' +
-          '<p><a href="/" style="color:#8A6A28;font-weight:600">Ir a la tienda</a></p></body>';
-        throw new Error("admin: acceso remoto bloqueado");
-      }
-    })();
-  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Milinov Jewelry | Admin</title>
-  <meta name="description" content="Panel local para administrar productos de Milinov Jewelry.">
-  <!-- Herramienta de uso LOCAL: no indexar ni publicar en hosting público -->
+  <title>Milinov Jewelry | Panel administrativo</title>
+  <meta name="description" content="Panel privado para administrar productos, fotos, precios y stock de Milinov Jewelry.">
   <meta name="robots" content="noindex, nofollow">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap">
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/styles.css?v=admin3">
 </head>
 <body class="admin-page">
-  <main class="admin-shell">
+  <main class="admin-access" id="adminLogin" hidden>
+    <section class="admin-login-card">
+      <a class="logo" href="index.html">Milinov <span>Jewelry</span></a>
+      <span class="eyebrow">Acceso privado</span>
+      <h1>Administra tu tienda</h1>
+      <p>Actualiza fotos, precios y unidades disponibles desde cualquier dispositivo.</p>
+      <form class="admin-login-form" id="adminLoginForm">
+        <label>Correo<input name="email" type="email" autocomplete="username" required placeholder="tu@correo.com"></label>
+        <label>Contraseña<input name="password" type="password" autocomplete="current-password" minlength="6" required placeholder="Tu contraseña"></label>
+        <button class="btn btn-primary" type="submit">Ingresar al panel</button>
+        <p class="admin-auth-status" id="adminAuthStatus" role="status"></p>
+      </form>
+      <a class="admin-back-link" href="index.html">Volver a la tienda</a>
+    </section>
+  </main>
+
+  <main class="admin-access" id="adminSetup" hidden>
+    <section class="admin-login-card admin-setup-card">
+      <a class="logo" href="index.html">Milinov <span>Jewelry</span></a>
+      <span class="eyebrow">Configuración pendiente</span>
+      <h1>Activa el inventario en línea</h1>
+      <p>El panel ya está construido. Falta conectar la base de datos segura para guardar fotos y stock en tiempo real.</p>
+      <a class="btn btn-outline" href="mailto:hola@milinovjoyeria.com?subject=Activar%20panel%20Milinov">Solicitar activación</a>
+      <a class="admin-back-link" href="index.html">Volver a la tienda</a>
+    </section>
+  </main>
+
+  <main class="admin-shell" id="adminApp" hidden>
     <section class="admin-hero">
       <a class="logo" href="index.html">Milinov <span>Jewelry</span></a>
       <div>
-        <span class="eyebrow">Backend local</span>
+        <span class="eyebrow">Inventario en línea</span>
         <h1>Inventario y precios</h1>
-        <p>Agrega joyas, sube varias fotos, cambia precios y stock, marca destacados y agotados.</p>
+        <p>Agrega joyas, sube fotos y cambia el stock. La tienda se actualiza en tiempo real.</p>
       </div>
-      <a class="btn btn-outline" href="index.html">Ver tienda</a>
+      <div class="admin-user-box">
+        <small id="adminIdentity"></small>
+        <a class="btn btn-outline" href="index.html" target="_blank" rel="noopener">Ver tienda</a>
+        <button class="btn btn-quiet" id="adminLogout" type="button" hidden>Cerrar sesión</button>
+      </div>
     </section>
 
     <section class="admin-grid">
@@ -50,7 +61,7 @@
         <h2>Producto</h2>
         <label>Género
           <select name="gender" required>
-            <option value="">Elige…</option>
+            <option value="">Elige...</option>
             <option>Mujer</option>
             <option>Hombre</option>
           </select>
@@ -77,8 +88,8 @@
           </select>
         </label>
         <div class="admin-form-row">
-          <label>Precio<input name="price" required type="number" min="0" step="0.01"></label>
-          <label>Precio antes <small>(opcional, para oferta)</small><input name="oldPrice" type="number" min="0" step="0.01"></label>
+          <label>Precio<input name="price" required type="number" min="0.01" step="0.01"></label>
+          <label>Precio antes <small>(opcional)</small><input name="oldPrice" type="number" min="0" step="0.01"></label>
         </div>
         <div class="admin-form-row">
           <label>Stock<input name="stock" required type="number" min="0" step="1"></label>
@@ -102,18 +113,18 @@
         </div>
         <label class="admin-check"><input name="featured" type="checkbox"> Mostrar en destacados de la portada</label>
 
-        <label>Fotos <small>(arrastra varias; la 1ª es la portada)</small></label>
+        <label>Fotos <small>(arrastra varias; la primera es la portada)</small></label>
         <div class="admin-image-preview" id="dropzone">
           <div class="admin-thumbs" id="adminThumbs"></div>
-          <p class="dropzone-hint">Arrastra aquí tus fotos o elígelas. Se reducen y comprimen solas antes de subir.</p>
+          <p class="dropzone-hint">Arrastra aquí tus fotos o elígelas. Se reducen y comprimen antes de subir.</p>
           <input id="imageFile" type="file" accept="image/png,image/jpeg,image/webp" multiple>
-          <input name="image" id="imagePath" placeholder="o pega una ruta existente: assets/products/collar.jpg">
+          <input name="image" id="imagePath" placeholder="o pega una URL de imagen existente">
         </div>
 
         <label>Cuidados <small>(opcional)</small><textarea name="care" placeholder="Evita perfumes y agua de mar. Guárdala seca."></textarea></label>
         <label>Descripción<textarea name="description" placeholder="Descripción breve para el catálogo"></textarea></label>
         <div class="admin-actions">
-          <button class="btn btn-primary" type="submit">Guardar</button>
+          <button class="btn btn-primary" type="submit">Guardar producto</button>
           <button class="btn btn-outline" type="button" id="clearForm">Limpiar</button>
         </div>
       </form>
@@ -122,17 +133,17 @@
         <div class="admin-list-head">
           <div>
             <h2>Joyas</h2>
-            <p id="adminStatus">Conectando con API...</p>
+            <p id="adminStatus" role="status">Conectando con el inventario...</p>
           </div>
           <div class="admin-actions compact">
-            <button class="btn btn-outline" type="button" id="importCsvBtn" title="Cargar muchos productos de una hoja de cálculo">Importar CSV</button>
-            <button class="btn btn-outline" type="button" id="csvTemplate" title="Descarga una plantilla de ejemplo">Plantilla CSV</button>
+            <button class="btn btn-outline" type="button" id="importCsvBtn">Importar CSV</button>
+            <button class="btn btn-outline" type="button" id="csvTemplate">Plantilla CSV</button>
             <button class="btn btn-outline" type="button" id="reloadProducts">Actualizar</button>
-            <button class="btn btn-outline" type="button" id="exportBackup" title="Descarga js/products.js con el catálogo actual para publicar la tienda sin backend">Exportar respaldo</button>
+            <button class="btn btn-outline" type="button" id="exportBackup">Exportar respaldo</button>
             <input id="csvFile" type="file" accept=".csv,text/csv" hidden>
           </div>
         </div>
-        <p class="admin-hint">Tip: edita el <strong>precio</strong> y el <strong>stock</strong> directamente en la tabla; se guardan solos al salir de la casilla.</p>
+        <p class="admin-hint">Edita el <strong>precio</strong> y el <strong>stock</strong> directamente en la tabla. El cambio se guarda al salir de la casilla.</p>
         <div class="admin-table-wrap">
           <table class="admin-table">
             <thead>
@@ -152,6 +163,7 @@
     </section>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7/dist/umd/supabase.min.js" defer></script>
   <script src="js/config.js" defer></script>
   <script src="js/admin.js" defer></script>
 </body>

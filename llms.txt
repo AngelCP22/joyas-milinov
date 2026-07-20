@@ -1,0 +1,21 @@
+# Milinov Jewelry
+
+Milinov Jewelry es una tienda de joyas con sede en Lima, Perú. Ofrece collares, pulseras, anillos, dijes y aretes en Plata 950 y cobre con enchape de oro 18k.
+
+## Páginas principales
+
+- Tienda: https://angelcp22.github.io/joyas-milinov/
+- Catálogo: https://angelcp22.github.io/joyas-milinov/catalogo.html
+- Contacto y preguntas frecuentes: https://angelcp22.github.io/joyas-milinov/contacto.html
+- Historia de la marca: https://angelcp22.github.io/joyas-milinov/nosotros.html
+- Políticas de compra: https://angelcp22.github.io/joyas-milinov/terminos.html
+
+## Compra y atención
+
+Los productos muestran material, precio y disponibilidad. Los pedidos se coordinan directamente por WhatsApp al +51 965 224 616. La tienda realiza envíos en Perú y ofrece empaque para regalo.
+
+## Perfiles oficiales
+
+- Instagram mujer: https://www.instagram.com/milinov_joyas/
+- Instagram hombre: https://www.instagram.com/milinovjoyas_men/
+- TikTok: https://www.tiktok.com/@geral.milinov

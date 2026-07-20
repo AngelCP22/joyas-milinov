@@ -143,26 +143,104 @@ const PRODUCTS = [
     weightG: 4,
     care: "Quítatela para dormir y bañarte. Guárdala seca para conservar el brillo."
   },
+  // ⚠️ PRECIOS TEMPORALES (colección de hombre) — la dueña los corregirá.
   {
     id: 11,
-    gender: "Mujer",
-    name: "Reloj Aurora (ejemplo)",
+    gender: "Hombre",
+    name: "Reloj Casio Plateado",
     category: "Relojes",
-    collection: "Gold18k",
+    collection: "Silver",
     material: "Reloj",
     price: 189,
-    image: "assets/placeholder.svg",
-    description: "Reloj de ejemplo. Reemplaza la foto y los datos desde el panel."
+    stock: 5,
+    image: "assets/products/reloj-casio-plateado.jpg",
+    images: ["assets/products/reloj-casio-plateado.jpg", "assets/products/reloj-casio-plateado-2.jpg"],
+    description: "Reloj Casio para caballero con esfera plateada y correa de acero. Resistente al agua.",
+    badge: "nuevo"
   },
   {
     id: 12,
     gender: "Hombre",
-    name: "Reloj Clásico (ejemplo)",
+    name: "Reloj Casio Negro",
     category: "Relojes",
     collection: "Silver",
     material: "Reloj",
-    price: 219,
-    image: "assets/placeholder.svg",
-    description: "Reloj de ejemplo. Reemplaza la foto y los datos desde el panel."
+    price: 199,
+    stock: 5,
+    image: "assets/products/reloj-casio-negro.jpg",
+    description: "Reloj Casio para caballero con esfera negra y correa de acero. Elegante y resistente al agua.",
+    badge: "nuevo"
+  },
+  {
+    id: 13,
+    gender: "Hombre",
+    name: "Collar Cadena Cubana",
+    category: "Collares",
+    collection: "Silver",
+    material: "Plata 950",
+    price: 280,
+    stock: 5,
+    image: "assets/products/collar-cubano-plata.jpg",
+    description: "Collar de cadena cubana en Plata 950, sobrio y masculino."
+  },
+  {
+    id: 14,
+    gender: "Hombre",
+    name: "Collar Cadena Cubana Gruesa",
+    category: "Collares",
+    collection: "Silver",
+    material: "Plata 950",
+    price: 390,
+    stock: 5,
+    image: "assets/products/collar-cubano-grueso-plata.jpg",
+    description: "Collar de cadena cubana gruesa en Plata 950, con presencia y peso."
+  },
+  {
+    id: 15,
+    gender: "Hombre",
+    name: "Pulsera Cadena Cubana",
+    category: "Pulseras",
+    collection: "Silver",
+    material: "Plata 950",
+    price: 160,
+    stock: 5,
+    image: "assets/products/pulsera-cubana-plata.jpg",
+    description: "Pulsera de cadena cubana en Plata 950 para uso diario."
+  },
+  {
+    id: 16,
+    gender: "Hombre",
+    name: "Pulsera Cordón",
+    category: "Pulseras",
+    collection: "Silver",
+    material: "Plata 950",
+    price: 140,
+    stock: 5,
+    image: "assets/products/pulsera-cordon-plata.jpg",
+    description: "Pulsera tipo cordón (torzal) en Plata 950, resistente y elegante."
+  },
+  {
+    id: 17,
+    gender: "Hombre",
+    name: "Pulsera Rolo",
+    category: "Pulseras",
+    collection: "Silver",
+    material: "Plata 950",
+    price: 170,
+    stock: 5,
+    image: "assets/products/pulsera-rolo-plata.jpg",
+    description: "Pulsera de eslabón rolo/ancla en Plata 950, de líneas limpias."
+  },
+  {
+    id: 18,
+    gender: "Hombre",
+    name: "Pulsera de Placa Personalizable",
+    category: "Pulseras",
+    collection: "Silver",
+    material: "Plata 950",
+    price: 190,
+    stock: 5,
+    image: "assets/products/pulsera-placa-personalizada.jpg",
+    description: "Pulsera de placa en Plata 950, personalizable con el nombre que elijas (grabado). En la foto, ejemplo \"Carlos\"."
   }
 ];

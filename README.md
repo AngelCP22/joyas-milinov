@@ -2,7 +2,7 @@
 
 Sitio web de **Milinov Jewelry**: joyas delicadas en **Plata 950** y **cobre con enchape de oro 18k**, con envíos a todo el Perú. Catálogo con filtros, carrito de compras y checkout por **WhatsApp** (sin pasarela de pagos: el pedido llega como mensaje listo para coordinar pago y envío).
 
-Hecho con **HTML + CSS + JavaScript vanilla** (sin frameworks ni build). Incluye un **backend local opcional** en Node.js para administrar inventario, precios y stock desde un panel visual.
+Hecho con **HTML + CSS + JavaScript vanilla** (sin frameworks ni build). Incluye un panel privado conectado a **Supabase** para administrar fotos, inventario, precios y stock en tiempo real, además de un backend local opcional en Node.js.
 
 > Documentación técnica completa en [docs/DOCUMENTACION.md](docs/DOCUMENTACION.md).
 > Escalabilidad, portabilidad (sin lock-in) y seguridad en [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md).
@@ -23,7 +23,7 @@ Hecho con **HTML + CSS + JavaScript vanilla** (sin frameworks ni build). Incluye
 | [terminos.html](terminos.html) | Términos y Condiciones (legal) |
 | [privacidad.html](privacidad.html) | Política de Privacidad — Ley 29733 (legal) |
 | [reclamaciones.html](reclamaciones.html) | **Libro de Reclamaciones** virtual (Indecopi), con formulario que envía por WhatsApp/correo |
-| [admin.html](admin.html) | **Panel local** de inventario (requiere el backend encendido) |
+| [admin.html](admin.html) | **Panel privado** de inventario, fotos, precios y stock |
 | [404.html](404.html) | Página de error amigable |
 
 > ⚖️ **Antes de vender formalmente en Perú:** completa en las páginas legales tu **razón social** y **RUC** (busca `[RAZÓN SOCIAL]` y `[RUC]`). El Libro de Reclamaciones es exigible a comercios por Indecopi.
@@ -55,6 +55,10 @@ Todo se edita en [js/config.js](js/config.js):
 
 ## Administrar productos (precios, stock, fotos)
 
+**En línea:** configura Supabase siguiendo [backend/supabase/README.md](backend/supabase/README.md). Después abre `admin.html`, inicia sesión y administra la tienda desde cualquier dispositivo. Los cambios se reflejan en el catálogo abierto sin republicar el sitio.
+
+**En local:** también se conserva el modo de desarrollo con Node:
+
 1. Arranca el backend (`cd backend && npm start`).
 2. Abre <http://localhost:3001/admin.html>.
 3. Crea, edita o elimina joyas. Sube **varias fotos por pieza** (arrastra y suelta o elige; se **comprimen solas** en el navegador, así las fotos pesadas del celular ya no son problema). La primera foto es la portada; puedes marcar otra como portada o quitarlas.
@@ -67,11 +71,11 @@ El panel **gestiona todo** el inventario, pero la tienda principal está protegi
 
 **Para publicar sin backend** (hosting estático, lo más común): en el panel pulsa **"Exportar respaldo"** → descarga un `products.js` con todo tu inventario actual → reemplázalo en `js/products.js` y sube ese archivo junto con las fotos. Así la tienda pública queda idéntica a lo que ves en el admin, sin necesitar el backend en línea.
 
-> ⚠️ **No subas `admin.html` ni la carpeta `backend/` a un hosting público**: el panel no tiene contraseña, está diseñado para usarse solo en tu computadora.
+> El `admin.html` publicado solo se habilita cuando Supabase está configurado y exige inicio de sesión. Nunca publiques claves secretas ni la clave `service_role`; el navegador usa únicamente la clave pública.
 
 ## Publicar el sitio (hosting estático)
 
-Sube todo **excepto** `backend/`, `admin.html`, `assets/source-joyas/` y `assets/contact-sheet.jpg` a cualquier hosting estático (Netlify, Vercel, GitHub Pages, cPanel…). No hay paso de build. Detalle completo en [docs/DOCUMENTACION.md](docs/DOCUMENTACION.md).
+Sube el frontend completo, incluido `admin.html`, y excluye `backend/`, `assets/source-joyas/` y `assets/contact-sheet.jpg`. Puedes usar cualquier hosting estático (Netlify, Vercel, GitHub Pages, cPanel…). No hay paso de build. Detalle completo en [docs/DOCUMENTACION.md](docs/DOCUMENTACION.md).
 
 ## Estructura
 

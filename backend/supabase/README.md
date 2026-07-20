@@ -1,66 +1,58 @@
-# Base de datos en línea con Supabase (opcional)
+# Inventario en línea con Supabase
 
-Con esto la tienda lee el catálogo **en vivo** desde Supabase y puedes **editar
-productos desde cualquier lugar** (sin volver a subir el sitio). Es opcional: si no
-configuras nada, la tienda sigue usando el catálogo local/estático como hasta ahora.
+Esta configuración activa `admin.html` como panel privado. Desde ahí se pueden
+crear joyas, subir fotos, editar precios y cambiar stock desde celular o PC. La
+tienda recibe los cambios en tiempo real. No requiere VPS.
 
-## Pasos (una sola vez, ~10 minutos)
+## Configuración inicial
 
-1. **Crea un proyecto** gratis en <https://supabase.com> (plan Free).
-2. En el panel: **SQL Editor → New query**, pega el contenido de
-   [`schema.sql`](schema.sql) y pulsa **Run**. Crea la tabla `products` con sus
-   reglas de seguridad (RLS).
-3. Repite con [`seed.sql`](seed.sql) para cargar los 12 productos de ejemplo
-   (luego los reemplazas por los reales).
-4. Ve a **Project Settings → API** y copia:
-   - **Project URL** (algo como `https://xxxx.supabase.co`)
-   - **Project API keys → `anon` `public`** (la clave pública; **NO** la `service_role`).
-5. Pégalas en [`../../js/config.js`](../../js/config.js), en `supabase`:
-   ```js
-   supabase: {
-     url: "https://xxxx.supabase.co",
-     anonKey: "eyJ...la-anon-key..."
-   }
-   ```
-6. Listo. Abre la tienda: ahora el catálogo viene de Supabase.
+1. Crea un proyecto en <https://supabase.com>.
+2. Abre **SQL Editor**, pega `schema.sql` y ejecútalo.
+3. Ejecuta `seed.sql` para cargar el catálogo actual de 18 productos.
+4. En **Authentication > Users**, crea la cuenta que usará la dueña.
+5. Autoriza esa cuenta desde SQL Editor, cambiando el correo:
 
-## Cómo administrar productos
+```sql
+insert into public.admin_users (user_id)
+select id from auth.users where email = 'TU_CORREO';
+```
 
-Desde Supabase: **Table Editor → products**. Agregas/editas filas (nombre, precio,
-género, material, categoría, foto, etc.) y la tienda lo refleja al instante. No
-necesitas tocar código ni republicar.
+6. En **Project Settings > API**, copia la URL del proyecto y la clave pública
+   (`publishable` o la antigua `anon`). Pégalas en `js/config.js`:
 
-- `gender` debe ser exactamente **Hombre** o **Mujer**.
-- `material`: **Plata 950**, **Cobre + enchape oro 18k** o **Reloj**.
-- `status`: **active** (visible), **draft** (oculto) o **sold_out** (agotado).
-- `images` es un arreglo JSON, p. ej. `["https://...supabase.co/.../foto1.jpg","https://...foto2.jpg"]`
-  (o rutas locales `["assets/products/x.jpg"]` si no usas Storage).
+```js
+supabase: {
+  url: "https://TU_PROYECTO.supabase.co",
+  anonKey: "TU_CLAVE_PUBLICA"
+}
+```
 
-## Fotos con Supabase Storage (subir/cambiar fotos sin republicar)
+7. Publica los cambios y abre `admin.html`. Inicia sesión con la cuenta del paso 4.
 
-Para poner fotos desde el navegador (sin tocar el sitio):
+## Qué queda funcionando
 
-1. En Supabase: **Storage → New bucket** → nombre `productos` → marca **Public bucket** → crear.
-2. Entra al bucket y **arrastra tus fotos** (súbelas optimizadas, ~<300 KB; idealmente cuadradas).
-3. En cada foto: **⋯ → Copy URL** (será algo como
-   `https://TUPROYECTO.supabase.co/storage/v1/object/public/productos/foto.jpg`).
-4. Pega esa URL en el campo **`image`** del producto (Table Editor), y en **`images`**
-   si quieres varias: `["https://...foto1.jpg","https://...foto2.jpg"]`.
-5. La tienda ya acepta esas URLs (la primera de `images` es la portada). Listo, sin republicar.
-
-> Para quitar/cambiar una foto, reemplázala en Storage o pega otra URL en el producto.
-> El bucket debe ser **público** para que la URL funcione directo (sin token).
+- Fotos comprimidas en el navegador y guardadas en el bucket `productos`.
+- Varias imágenes por joya; la primera se usa como portada.
+- Alta, edición, duplicado y eliminación de productos.
+- Edición rápida de precio y stock desde la tabla.
+- Stock `0` marca automáticamente el producto como agotado.
+- Estado activo, borrador o agotado.
+- Sincronización en tiempo real entre el panel y la tienda abierta.
+- Importación CSV y exportación de un respaldo estático.
 
 ## Seguridad
 
-- La `anon key` es **pública por diseño** y puede ir en el navegador: las políticas
-  **RLS** (en `schema.sql`) solo permiten **leer** productos `active`. Para **escribir**
-  hay que estar **autenticado** (tú, desde el panel de Supabase).
-- **Nunca** pongas la `service_role` key en `config.js` ni en el frontend.
+`schema.sql` habilita RLS en las tablas expuestas. El público solo puede leer
+productos activos o agotados. Solo usuarios incluidos en `admin_users` pueden
+ver borradores, editar productos o subir fotos.
 
-## Relación con el panel admin local
+La clave pública puede estar en el navegador. Nunca pongas una clave
+`service_role` o secreta en `js/config.js`.
 
-El panel `admin.html` (backend Node) sigue funcionando para uso local. Si usas
-Supabase como fuente en línea, lo natural es administrar desde el **Table Editor de
-Supabase**. (Conectar `admin.html` directamente a Supabase con login es un paso
-futuro opcional.)
+Para agregar otra administradora, crea su usuario y repite el `insert` del paso 5.
+Para retirar acceso:
+
+```sql
+delete from public.admin_users
+where user_id = (select id from auth.users where email = 'CORREO_A_RETIRAR');
+```

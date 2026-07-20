@@ -45,9 +45,15 @@ function availableStock(product) {
 
 /** Quita del carrito productos que ya no existen en el catálogo (eliminados en el admin). */
 function pruneCart() {
-  const before = cart.length;
-  cart = cart.filter(item => findProduct(item.id));
-  if (cart.length !== before) saveCart();
+  const before = JSON.stringify(cart);
+  cart = cart.flatMap(item => {
+    const product = findProduct(item.id);
+    if (!product) return [];
+    const stock = availableStock(product);
+    if (stock <= 0) return [];
+    return [{ id: item.id, qty: Math.min(item.qty, stock, 99) }];
+  });
+  if (JSON.stringify(cart) !== before) saveCart();
 }
 
 function addToCart(id, qty = 1) {
@@ -158,9 +164,10 @@ function buildWhatsappText(singleProduct = null, qty = 1) {
   };
 
   if (singleProduct) {
-    lines.push(lineFor(singleProduct, qty));
+    const safeQty = Math.max(1, Math.min(Math.floor(Number(qty) || 1), availableStock(singleProduct), 99));
+    lines.push(lineFor(singleProduct, safeQty));
     lines.push("");
-    lines.push(`Total: S/ ${(singleProduct.price * qty).toFixed(2)}`);
+    lines.push(`Total: S/ ${(singleProduct.price * safeQty).toFixed(2)}`);
   } else {
     cart.forEach(item => {
       const product = findProduct(item.id);
@@ -188,15 +195,26 @@ function whatsappSingleUrl(product, qty = 1) {
 }
 
 function openCart() {
-  document.querySelector(".cart-drawer")?.classList.add("is-open");
+  closeMobileMenu();
+  const drawer = document.querySelector(".cart-drawer");
+  drawer?.classList.add("is-open");
+  drawer?.setAttribute("aria-hidden", "false");
+  if (drawer) drawer.inert = false;
+  document.querySelectorAll("[data-open-cart]").forEach(btn => btn.setAttribute("aria-expanded", "true"));
   document.querySelector(".overlay")?.classList.add("is-open");
   document.body.classList.add("no-scroll");
+  document.querySelector("[data-close-cart]")?.focus();
 }
 
 function closeCart() {
-  document.querySelector(".cart-drawer")?.classList.remove("is-open");
-  document.querySelector(".overlay")?.classList.remove("is-open");
-  document.body.classList.remove("no-scroll");
+  const drawer = document.querySelector(".cart-drawer");
+  drawer?.classList.remove("is-open");
+  drawer?.setAttribute("aria-hidden", "true");
+  if (drawer) drawer.inert = true;
+  document.querySelectorAll("[data-open-cart]").forEach(btn => btn.setAttribute("aria-expanded", "false"));
+  const menuOpen = document.querySelector(".mobile-menu")?.classList.contains("is-open");
+  document.querySelector(".overlay")?.classList.toggle("is-open", !!menuOpen);
+  document.body.classList.toggle("no-scroll", !!menuOpen);
 }
 
 function updateCartUI() {

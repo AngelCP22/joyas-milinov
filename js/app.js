@@ -23,6 +23,9 @@ function qsa(selector) {
   return [...document.querySelectorAll(selector)];
 }
 
+let catalogSupabaseClient = null;
+let inventoryRealtimeChannel = null;
+
 /** Imagen local de respaldo cuando falla la carga de una foto de producto. */
 function productImageFallback(event) {
   event.target.onerror = null;
@@ -83,7 +86,7 @@ async function hydrateProductsFromApi() {
   // 1) Supabase (catálogo en línea), si está configurado en config.js.
   try {
     const fromSupabase = await loadFromSupabase();
-    if (Array.isArray(fromSupabase) && fromSupabase.length) {
+    if (Array.isArray(fromSupabase)) {
       PRODUCTS.splice(0, PRODUCTS.length, ...fromSupabase);
       return true;
     }
@@ -122,15 +125,20 @@ async function loadFromSupabase() {
   if (!window.supabase) {
     await new Promise((resolve, reject) => {
       const script = document.createElement("script");
-      script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+      script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7/dist/umd/supabase.min.js";
       script.onload = resolve;
       script.onerror = reject;
       document.head.appendChild(script);
     });
   }
 
-  const client = window.supabase.createClient(cfg.url, cfg.anonKey);
-  const { data, error } = await client.from("products").select("*").eq("status", "active").order("id");
+  if (!catalogSupabaseClient) {
+    catalogSupabaseClient = window.supabase.createClient(cfg.url, cfg.anonKey);
+  }
+  const { data, error } = await catalogSupabaseClient.from("products")
+    .select("*")
+    .in("status", ["active", "sold_out"])
+    .order("id");
   if (error || !Array.isArray(data)) return null;
 
   return data.map(row => ({
@@ -154,6 +162,29 @@ async function loadFromSupabase() {
     warranty: row.warranty,
     featured: row.featured
   }));
+}
+
+/** Escucha cambios de inventario y repinta la tienda sin recargar la página. */
+function subscribeInventoryRealtime() {
+  if (!catalogSupabaseClient || inventoryRealtimeChannel) return;
+  let refreshTimer;
+  const refresh = () => {
+    clearTimeout(refreshTimer);
+    refreshTimer = setTimeout(async () => {
+      const updated = await loadFromSupabase();
+      if (!Array.isArray(updated)) return;
+      PRODUCTS.splice(0, PRODUCTS.length, ...updated);
+      refreshDynamicViews();
+    }, 180);
+  };
+
+  inventoryRealtimeChannel = catalogSupabaseClient.channel("store-products-live")
+    .on("postgres_changes", { event: "*", schema: "public", table: "products" }, refresh)
+    .subscribe();
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") refresh();
+  });
 }
 
 /** Repinta todas las vistas que dependen de PRODUCTS tras la hidratación. */
@@ -201,7 +232,11 @@ function initFeaturedSlider() {
 
   if (pages <= 1) {
     dots.innerHTML = "";
-    cards.forEach(card => card.classList.remove("is-slider-hidden"));
+    cards.forEach(card => {
+      card.classList.remove("is-slider-hidden");
+      card.removeAttribute("aria-hidden");
+      card.inert = false;
+    });
     return;
   }
 
@@ -215,7 +250,10 @@ function initFeaturedSlider() {
     const end = start + pageSize;
 
     cards.forEach((card, index) => {
-      card.classList.toggle("is-slider-hidden", index < start || index >= end);
+      const hidden = index < start || index >= end;
+      card.classList.toggle("is-slider-hidden", hidden);
+      card.setAttribute("aria-hidden", hidden ? "true" : "false");
+      card.inert = hidden;
     });
 
     qsa("[data-featured-page]").forEach((button, index) => {
@@ -292,9 +330,15 @@ function initCatalog() {
   catalogState.material = params.get("material") || "all";
   catalogState.collection = params.get("collection") || "all";
   catalogState.search = params.get("search") || "";
+  catalogState.sort = params.get("sort") || "featured";
+  if (!["featured", "price-asc", "price-desc"].includes(catalogState.sort)) catalogState.sort = "featured";
 
   const searchInput = qs("#catalogSearch");
   if (searchInput && catalogState.search) searchInput.value = catalogState.search;
+  const sortInput = qs("#sortFilter");
+  if (sortInput && ["featured", "price-asc", "price-desc"].includes(catalogState.sort)) {
+    sortInput.value = catalogState.sort;
+  }
 
   buildCatalogFilterOptions();
 
@@ -320,11 +364,9 @@ function applyCatalogFilters() {
   }
 
   if (catalogState.search) {
-    const term = catalogState.search.toLowerCase();
+    const term = normalizeSearch(catalogState.search);
     filtered = filtered.filter(product =>
-      [product.name, product.category, product.collection, product.material, product.description]
-        .join(" ")
-        .toLowerCase()
+      normalizeSearch([product.name, product.category, product.collection, product.material, product.description].join(" "))
         .includes(term)
     );
   }
@@ -344,6 +386,14 @@ function applyCatalogFilters() {
   if (catalogState.sort === "price-asc") filtered.sort((a, b) => a.price - b.price);
   if (catalogState.sort === "price-desc") filtered.sort((a, b) => b.price - a.price);
 
+  const url = new URL(window.location.href);
+  ["gender", "category", "material", "collection", "search", "sort"].forEach(key => {
+    const value = String(catalogState[key] || "").trim();
+    if (!value || value === "all" || (key === "sort" && value === "featured")) url.searchParams.delete(key);
+    else url.searchParams.set(key, value);
+  });
+  window.history.replaceState({}, "", `${url.pathname}${url.search}`);
+
   renderProducts("#catalogGrid", filtered);
   const count = qs("#catalogCount");
   if (count) count.textContent = `${filtered.length} producto${filtered.length === 1 ? "" : "s"}`;
@@ -357,6 +407,26 @@ function applyCatalogFilters() {
     if (catalogState.gender !== "all") parts.push(`· ${catalogState.gender}`);
     title.textContent = parts.length ? parts.join(" ") : "Joyas para cada momento";
   }
+
+  const clear = qs("#clearCatalogFilters");
+  if (clear) {
+    const active = catalogState.search || ["gender", "category", "material", "collection"].some(key => catalogState[key] !== "all") || catalogState.sort !== "featured";
+    clear.hidden = !active;
+  }
+}
+
+function normalizeSearch(value) {
+  return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
+
+function clearCatalogFilters() {
+  catalogState = { search: "", gender: "all", category: "all", material: "all", collection: "all", sort: "featured" };
+  qsa("[data-filter]").forEach(input => {
+    input.value = input.tagName === "SELECT" ? "all" : "";
+  });
+  const sort = qs("#sortFilter");
+  if (sort) sort.value = "featured";
+  applyCatalogFilters();
 }
 
 /**
@@ -429,6 +499,7 @@ function initProductPage() {
     .slice(0, 4);
 
   document.title = `${product.name} | ${window.MILINOV.brand}`;
+  updateProductMetadata(product);
 
   const thumbsHtml = images.length > 1
     ? `<div class="thumbs">${images.map((src, i) => `
@@ -506,13 +577,17 @@ function initProductPage() {
   });
 
   let qty = 1;
+  const available = availableStock(product);
+  const stockLimit = Number.isFinite(available) ? Math.max(1, Math.min(99, available)) : 99;
   const qtyNode = qs("#productQty");
   qs("#productMinus").addEventListener("click", () => {
     qty = Math.max(1, qty - 1);
     qtyNode.textContent = qty;
   });
   qs("#productPlus").addEventListener("click", () => {
-    qty = Math.min(99, qty + 1);
+    const next = Math.min(stockLimit, qty + 1);
+    if (next === qty && !soldOut) showToast(`Solo quedan ${stockLimit} unidades de ${product.name}`);
+    qty = next;
     qtyNode.textContent = qty;
   });
   qs("#addProductBtn").addEventListener("click", () => addToCart(product.id, qty));
@@ -583,7 +658,9 @@ function injectProductJsonLd(product) {
     "@type": "Product",
     name: product.name,
     description: product.description,
-    image: new URL(product.image, window.location.href).href,
+    image: (Array.isArray(product.images) && product.images.length ? product.images : [product.image]).map(absoluteSiteUrl),
+    url: absoluteSiteUrl(`producto.html?id=${Number(product.id)}`),
+    sku: `MIL-${Number(product.id)}`,
     category: product.category,
     material: product.material,
     brand: { "@type": "Brand", name: window.MILINOV.brand },
@@ -591,12 +668,30 @@ function injectProductJsonLd(product) {
       "@type": "Offer",
       priceCurrency: "PEN",
       price: product.price,
+      url: absoluteSiteUrl(`producto.html?id=${Number(product.id)}`),
+      itemCondition: "https://schema.org/NewCondition",
       availability: isSoldOut(product)
         ? "https://schema.org/OutOfStock"
         : "https://schema.org/InStock"
     }
   });
   document.head.appendChild(script);
+}
+
+function updateProductMetadata(product) {
+  const url = absoluteSiteUrl(`producto.html?id=${Number(product.id)}`);
+  const image = absoluteSiteUrl(bestSrc(product.image));
+  const description = `${product.name} en ${product.material}. ${product.description} Precio ${money(product.price)}.`;
+  const setMeta = (selector, attribute, value) => {
+    const node = qs(selector);
+    if (node) node.setAttribute(attribute, value);
+  };
+  setMeta('link[rel="canonical"]', "href", url);
+  setMeta('meta[name="description"]', "content", description);
+  setMeta('meta[property="og:title"]', "content", `${product.name} | ${window.MILINOV.brand}`);
+  setMeta('meta[property="og:description"]', "content", description);
+  setMeta('meta[property="og:image"]', "content", image);
+  setMeta('meta[property="og:url"]', "content", url);
 }
 
 /* ============================================================
@@ -754,6 +849,18 @@ function initCookieBanner() {
 }
 
 function initUI() {
+  const menu = qs(".mobile-menu");
+  if (menu) {
+    menu.setAttribute("aria-hidden", "true");
+    menu.inert = true;
+  }
+  const drawer = qs(".cart-drawer");
+  if (drawer) {
+    drawer.setAttribute("aria-hidden", "true");
+    drawer.inert = true;
+  }
+  qsa("[data-open-menu], [data-open-cart]").forEach(btn => btn.setAttribute("aria-expanded", "false"));
+
   qsa("[data-open-cart]").forEach(btn => btn.addEventListener("click", openCart));
   qsa("[data-close-cart]").forEach(btn => btn.addEventListener("click", closeCart));
   qs(".overlay")?.addEventListener("click", () => {
@@ -787,6 +894,7 @@ function initUI() {
   });
 
   updateCartUI();
+  qs("#clearCatalogFilters")?.addEventListener("click", clearCatalogFilters);
 }
 
 /**
@@ -913,15 +1021,26 @@ function initPromoBar() {
 }
 
 function openMobileMenu() {
-  qs(".mobile-menu")?.classList.add("is-open");
+  closeCart();
+  const menu = qs(".mobile-menu");
+  menu?.classList.add("is-open");
+  menu?.setAttribute("aria-hidden", "false");
+  if (menu) menu.inert = false;
+  qsa("[data-open-menu]").forEach(btn => btn.setAttribute("aria-expanded", "true"));
   qs(".overlay")?.classList.add("is-open");
   document.body.classList.add("no-scroll");
+  qs("[data-close-menu]")?.focus();
 }
 
 function closeMobileMenu() {
-  qs(".mobile-menu")?.classList.remove("is-open");
-  qs(".overlay")?.classList.remove("is-open");
-  document.body.classList.remove("no-scroll");
+  const menu = qs(".mobile-menu");
+  menu?.classList.remove("is-open");
+  menu?.setAttribute("aria-hidden", "true");
+  if (menu) menu.inert = true;
+  qsa("[data-open-menu]").forEach(btn => btn.setAttribute("aria-expanded", "false"));
+  const cartOpen = qs(".cart-drawer")?.classList.contains("is-open");
+  qs(".overlay")?.classList.toggle("is-open", !!cartOpen);
+  document.body.classList.toggle("no-scroll", !!cartOpen);
 }
 
 /* ============================================================
@@ -948,5 +1067,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // 2) Hidratación en segundo plano con el inventario real, si hay backend.
   hydrateProductsFromApi().then(updated => {
     if (updated) refreshDynamicViews();
+    subscribeInventoryRealtime();
   });
 });

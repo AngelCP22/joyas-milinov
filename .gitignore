@@ -6,6 +6,7 @@ assets/source-joyas/
 Thumbs.db
 .DS_Store
 node_modules/
+dist/
 
 # Archivos temporales de la escritura atómica del backend
 backend/data/*.tmp

@@ -47,4 +47,4 @@ curl -X POST http://localhost:3001/api/products ^
 
 ## Seguridad
 
-⚠️ **Sin autenticación, solo para uso local.** No exponer a internet ni desplegar la carpeta `backend/` o `admin.html` en el hosting público. El servidor estático nunca expone `backend/` por HTTP, pero el API acepta cualquier petición de quien pueda alcanzar el puerto.
+⚠️ **Este servidor Node no tiene autenticación y es solo para uso local.** No expongas el puerto ni despliegues la carpeta `backend/` en internet: el API acepta peticiones de cualquiera que pueda alcanzarlo. El `admin.html` público usa un camino distinto y seguro: Supabase Auth + RLS.
