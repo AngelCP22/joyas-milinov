@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=admin3">
+  <link rel="stylesheet" href="css/styles.css?v=admin4">
 </head>
 <body class="admin-page">
   <main class="admin-access" id="adminLogin" hidden>
@@ -55,10 +55,45 @@
       </div>
     </section>
 
-    <section class="admin-grid">
-      <form class="admin-card admin-form" id="productForm">
+    <section class="admin-overview" aria-label="Resumen del inventario">
+      <button class="admin-stat is-active" type="button" data-inventory-filter="all">
+        <span>Total de joyas</span>
+        <strong id="statTotal">0</strong>
+        <small>Ver inventario completo</small>
+      </button>
+      <button class="admin-stat" type="button" data-inventory-filter="active">
+        <span>Disponibles</span>
+        <strong id="statActive">0</strong>
+        <small>Publicadas con stock</small>
+      </button>
+      <button class="admin-stat" type="button" data-inventory-filter="low">
+        <span>Poco stock</span>
+        <strong id="statLow">0</strong>
+        <small>3 unidades o menos</small>
+      </button>
+      <button class="admin-stat" type="button" data-inventory-filter="sold_out">
+        <span>Agotadas</span>
+        <strong id="statSoldOut">0</strong>
+        <small>Necesitan reposición</small>
+      </button>
+    </section>
+
+    <nav class="admin-view-tabs" aria-label="Secciones del panel">
+      <button class="is-active" type="button" data-admin-view="products" aria-current="page">Productos</button>
+      <button type="button" data-admin-view="editor">Nueva joya</button>
+    </nav>
+
+    <section class="admin-workspace">
+      <form class="admin-card admin-form" id="productForm" hidden>
         <input type="hidden" name="id">
-        <h2>Producto</h2>
+        <div class="admin-form-heading">
+          <div>
+            <span class="eyebrow" id="formEyebrow">Nuevo producto</span>
+            <h2 id="formTitle">Agregar joya</h2>
+            <p>Completa los datos y agrega al menos una foto. El stock se reflejará en la tienda.</p>
+          </div>
+          <button class="btn btn-quiet" type="button" id="closeForm">Volver a productos</button>
+        </div>
         <label>Género
           <select name="gender" required>
             <option value="">Elige...</option>
@@ -125,23 +160,59 @@
         <label>Descripción<textarea name="description" placeholder="Descripción breve para el catálogo"></textarea></label>
         <div class="admin-actions">
           <button class="btn btn-primary" type="submit">Guardar producto</button>
-          <button class="btn btn-outline" type="button" id="clearForm">Limpiar</button>
+          <button class="btn btn-outline" type="button" id="clearForm">Limpiar campos</button>
+          <button class="btn btn-quiet" type="button" id="cancelForm">Cancelar</button>
         </div>
       </form>
 
-      <section class="admin-card admin-list">
+      <section class="admin-card admin-list" id="productsView">
         <div class="admin-list-head">
           <div>
-            <h2>Joyas</h2>
+            <span class="eyebrow">Catálogo</span>
+            <h2>Productos</h2>
             <p id="adminStatus" role="status">Conectando con el inventario...</p>
           </div>
-          <div class="admin-actions compact">
-            <button class="btn btn-outline" type="button" id="importCsvBtn">Importar CSV</button>
-            <button class="btn btn-outline" type="button" id="csvTemplate">Plantilla CSV</button>
-            <button class="btn btn-outline" type="button" id="reloadProducts">Actualizar</button>
-            <button class="btn btn-outline" type="button" id="exportBackup">Exportar respaldo</button>
+          <div class="admin-list-actions">
+            <button class="btn btn-primary" type="button" id="newProduct">Nueva joya</button>
+            <details class="admin-tools">
+              <summary class="btn btn-outline">Más acciones</summary>
+              <div class="admin-tools-menu">
+                <button type="button" id="importCsvBtn">Importar CSV</button>
+                <button type="button" id="csvTemplate">Descargar plantilla CSV</button>
+                <button type="button" id="reloadProducts">Actualizar inventario</button>
+                <button type="button" id="exportBackup">Exportar respaldo</button>
+              </div>
+            </details>
             <input id="csvFile" type="file" accept=".csv,text/csv" hidden>
           </div>
+        </div>
+        <div class="admin-filters" aria-label="Filtros del inventario">
+          <label class="admin-search">
+            <span>Buscar</span>
+            <input id="adminSearch" type="search" placeholder="Nombre, SKU, modelo o material">
+          </label>
+          <label>
+            <span>Categoría</span>
+            <select id="adminCategoryFilter">
+              <option value="">Todas</option>
+              <option>Collares</option>
+              <option>Pulseras</option>
+              <option>Anillos</option>
+              <option>Aretes</option>
+              <option>Dijes</option>
+              <option>Relojes</option>
+            </select>
+          </label>
+          <label>
+            <span>Estado</span>
+            <select id="adminStatusFilter">
+              <option value="">Todos</option>
+              <option value="active">Activo</option>
+              <option value="draft">Borrador</option>
+              <option value="sold_out">Agotado</option>
+            </select>
+          </label>
+          <button class="btn btn-quiet admin-clear-filters" id="clearFilters" type="button">Limpiar filtros</button>
         </div>
         <p class="admin-hint">Edita el <strong>precio</strong> y el <strong>stock</strong> directamente en la tabla. El cambio se guarda al salir de la casilla.</p>
         <div class="admin-table-wrap">
@@ -165,6 +236,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7/dist/umd/supabase.min.js" defer></script>
   <script src="js/config.js" defer></script>
-  <script src="js/admin.js" defer></script>
+  <script src="js/admin.js?v=admin4" defer></script>
 </body>
 </html>

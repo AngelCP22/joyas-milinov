@@ -22,12 +22,21 @@ const loginForm = document.querySelector("#adminLoginForm");
 const authStatus = document.querySelector("#adminAuthStatus");
 const identityNode = document.querySelector("#adminIdentity");
 const logoutButton = document.querySelector("#adminLogout");
+const productsView = document.querySelector("#productsView");
+const viewButtons = [...document.querySelectorAll("[data-admin-view]")];
+const statButtons = [...document.querySelectorAll("[data-inventory-filter]")];
+const searchInput = document.querySelector("#adminSearch");
+const categoryFilter = document.querySelector("#adminCategoryFilter");
+const statusFilter = document.querySelector("#adminStatusFilter");
+const formTitle = document.querySelector("#formTitle");
+const formEyebrow = document.querySelector("#formEyebrow");
 
 let products = [];
 let selectedImages = [];
 let db = null;
 let dataMode = "local";
 let realtimeChannel = null;
+let inventoryFilter = "all";
 
 function moneyAdmin(value) {
   return typeof money === "function" ? money(value) : `S/ ${Number(value).toFixed(2)}`;
@@ -273,6 +282,9 @@ function fillForm(product) {
     ? product.images.slice()
     : (product.image ? [product.image] : []);
   renderThumbs();
+  formTitle.textContent = "Editar joya";
+  formEyebrow.textContent = product.name || "Producto";
+  setAdminView("editor");
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -281,6 +293,8 @@ function clearForm() {
   form.elements.id.value = "";
   selectedImages = [];
   renderThumbs();
+  formTitle.textContent = "Agregar joya";
+  formEyebrow.textContent = "Nuevo producto";
 }
 
 /* ============================================================
@@ -289,8 +303,73 @@ function clearForm() {
 
 const STATUS_LABELS = { active: "Activo", draft: "Borrador", sold_out: "Agotado" };
 
+function setAdminView(view) {
+  const showEditor = view === "editor";
+  form.hidden = !showEditor;
+  productsView.hidden = showEditor;
+  viewButtons.forEach(button => {
+    const active = button.dataset.adminView === view;
+    button.classList.toggle("is-active", active);
+    if (active) button.setAttribute("aria-current", "page");
+    else button.removeAttribute("aria-current");
+  });
+  if (!showEditor) window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function matchesInventoryFilter(product) {
+  if (inventoryFilter === "active") return product.status === "active" && Number(product.stock) > 0;
+  if (inventoryFilter === "low") return product.status === "active" && Number(product.stock) > 0 && Number(product.stock) <= 3;
+  if (inventoryFilter === "sold_out") return product.status === "sold_out" || Number(product.stock) === 0;
+  return true;
+}
+
+function visibleProducts() {
+  const term = searchInput?.value.trim().toLocaleLowerCase("es") || "";
+  const category = categoryFilter?.value || "";
+  const status = statusFilter?.value || "";
+
+  return products.filter(product => {
+    const searchable = [
+      product.name,
+      product.sku,
+      product.model,
+      product.material,
+      product.collection
+    ].join(" ").toLocaleLowerCase("es");
+    return matchesInventoryFilter(product)
+      && (!term || searchable.includes(term))
+      && (!category || product.category === category)
+      && (!status || product.status === status);
+  });
+}
+
+function renderInventorySummary() {
+  const available = products.filter(product => product.status === "active" && Number(product.stock) > 0).length;
+  const low = products.filter(product => product.status === "active" && Number(product.stock) > 0 && Number(product.stock) <= 3).length;
+  const soldOut = products.filter(product => product.status === "sold_out" || Number(product.stock) === 0).length;
+  document.querySelector("#statTotal").textContent = products.length;
+  document.querySelector("#statActive").textContent = available;
+  document.querySelector("#statLow").textContent = low;
+  document.querySelector("#statSoldOut").textContent = soldOut;
+}
+
 function renderProducts() {
-  tableBody.innerHTML = products.map(product => `
+  const visible = visibleProducts();
+  renderInventorySummary();
+  if (!visible.length) {
+    tableBody.innerHTML = `
+      <tr>
+        <td class="admin-empty" colspan="6">
+          <strong>No hay productos con estos filtros</strong>
+          <span>Prueba otra búsqueda o limpia los filtros.</span>
+        </td>
+      </tr>
+    `;
+    setStatus(`0 de ${products.length} productos`);
+    return;
+  }
+
+  tableBody.innerHTML = visible.map(product => `
     <tr data-id="${Number(product.id)}">
       <td>
         <span class="admin-product-cell">
@@ -309,13 +388,15 @@ function renderProducts() {
       </td>
     </tr>
   `).join("");
+  setStatus(visible.length === products.length
+    ? `${products.length} productos cargados`
+    : `${visible.length} de ${products.length} productos`);
 }
 
 async function loadProducts() {
   try {
     products = await request("/products");
     renderProducts();
-    setStatus(`${products.length} productos cargados`);
   } catch (error) {
     const sinConexionLocal = dataMode === "local" && error instanceof TypeError;
     setStatus(sinConexionLocal ? "No se pudo conectar. Ejecuta: cd backend && npm start" : error.message);
@@ -415,6 +496,7 @@ form?.addEventListener("submit", async event => {
     }
     clearForm();
     await loadProducts();
+    setAdminView("products");
   } catch (error) {
     setStatus(error.message);
   }
@@ -678,10 +760,40 @@ async function initAdmin() {
 // Wiring de la barra de acciones con optional chaining: si admin.js se cargara
 // por error en otra página (sin estos elementos), no rompe nada.
 document.querySelector("#clearForm")?.addEventListener("click", clearForm);
+document.querySelector("#newProduct")?.addEventListener("click", () => {
+  clearForm();
+  setAdminView("editor");
+});
+document.querySelector("#closeForm")?.addEventListener("click", () => setAdminView("products"));
+document.querySelector("#cancelForm")?.addEventListener("click", () => {
+  clearForm();
+  setAdminView("products");
+});
 document.querySelector("#reloadProducts")?.addEventListener("click", loadProducts);
 document.querySelector("#exportBackup")?.addEventListener("click", exportBackup);
 document.querySelector("#importCsvBtn")?.addEventListener("click", () => csvFile?.click());
 document.querySelector("#csvTemplate")?.addEventListener("click", downloadCsvTemplate);
+viewButtons.forEach(button => button.addEventListener("click", () => {
+  if (button.dataset.adminView === "editor") clearForm();
+  setAdminView(button.dataset.adminView);
+}));
+statButtons.forEach(button => button.addEventListener("click", () => {
+  inventoryFilter = button.dataset.inventoryFilter;
+  statButtons.forEach(item => item.classList.toggle("is-active", item === button));
+  setAdminView("products");
+  renderProducts();
+}));
+[searchInput, categoryFilter, statusFilter].forEach(control => {
+  control?.addEventListener(control === searchInput ? "input" : "change", renderProducts);
+});
+document.querySelector("#clearFilters")?.addEventListener("click", () => {
+  searchInput.value = "";
+  categoryFilter.value = "";
+  statusFilter.value = "";
+  inventoryFilter = "all";
+  statButtons.forEach(button => button.classList.toggle("is-active", button.dataset.inventoryFilter === "all"));
+  renderProducts();
+});
 csvFile?.addEventListener("change", () => {
   importCsv(csvFile.files[0]);
   csvFile.value = "";
