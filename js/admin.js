@@ -5,7 +5,7 @@
 const API_URL = window.MILINOV?.apiUrl || "http://localhost:3001/api";
 const SUPABASE_CONFIG = window.MILINOV?.supabase || {};
 const IS_LOCAL = location.protocol === "file:" || ["localhost", "127.0.0.1", "::1", ""].includes(location.hostname);
-const HAS_SUPABASE = Boolean(SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey && window.supabase);
+const HAS_SUPABASE = Boolean(SUPABASE_CONFIG.enabled && SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey && window.supabase);
 
 const form = document.querySelector("#productForm");
 const tableBody = document.querySelector("#adminProducts");

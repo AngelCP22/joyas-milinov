@@ -22,12 +22,17 @@ select id from auth.users where email = 'TU_CORREO';
 
 ```js
 supabase: {
+  enabled: true,
   url: "https://TU_PROYECTO.supabase.co",
   anonKey: "TU_CLAVE_PUBLICA"
 }
 ```
 
 7. Publica los cambios y abre `admin.html`. Inicia sesión con la cuenta del paso 4.
+
+La publicación de producción mantiene `enabled: false` y excluye el panel hasta
+que Auth, RLS y Storage hayan sido configurados y verificados. Al completar esa
+revisión se habilitan conjuntamente el flag y los artefactos del panel.
 
 ## Qué queda funcionando
 

@@ -2,7 +2,7 @@
  * config.js — Configuración central de Milinov Jewelry.
  *
  * ÚNICO lugar donde se edita el número de WhatsApp, los datos de la marca
- * y la URL del API. Todos los demás scripts (cart.js, app.js, admin.js)
+ * y la URL del API. Todos los demás scripts públicos leen de aquí.
  * leen de aquí. Este archivo debe cargarse ANTES que el resto.
  */
 window.MILINOV = {
@@ -71,14 +71,14 @@ window.MILINOV = {
   },
 
   /**
-   * Base de datos en línea (Supabase). Catálogo en vivo: si pones aquí la URL y
-   * la clave pública de tu proyecto, la tienda lee los productos de Supabase y
-   * /admin permite editarlos con login, sin republicar. Si están vacías, la
-   * tienda usa el backend local / el catálogo estático, como hasta ahora.
+   * Integración de inventario en línea reservada para una fase posterior.
+   * Mientras enabled sea false, el sitio no crea conexiones con Supabase,
+   * incluso si se añadieran credenciales por error.
    * La anon key es pública por diseño; la seguridad la dan las políticas RLS
    * (ver backend/supabase/schema.sql). NO pongas aquí la "service_role" key.
    */
   supabase: {
+    enabled: false,
     url: "",        // https://TUPROYECTO.supabase.co
     anonKey: ""     // clave pública "publishable" o la antigua "anon"
   },

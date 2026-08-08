@@ -3,9 +3,8 @@
  *
  * Es lo que ve el cliente cuando el sitio está en un hosting estático o el
  * backend local está apagado. Si el backend (backend/server.js) está activo,
- * app.js reemplaza esta lista con el inventario real de backend/data/products.json,
- * que se administra desde admin.html. El backend además regenera este archivo
- * automáticamente al guardar (no hace falta editarlo a mano si usas el panel).
+ * app.js reemplaza esta lista con el inventario real de backend/data/products.json
+ * cuando se trabaja en el entorno local.
  *
  * Campos: id (único), gender ("Hombre" | "Mujer"), name, category, collection,
  * material, price (S/), image (ruta relativa), description.

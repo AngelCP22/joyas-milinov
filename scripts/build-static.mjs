@@ -13,7 +13,7 @@ await rm(output, { recursive: true, force: true });
 await mkdir(output, { recursive: true });
 
 const rootFiles = [
-  "404.html", "admin.html", "catalogo.html", "contacto.html", "enlaces.html",
+  "404.html", "catalogo.html", "contacto.html", "enlaces.html",
   "index.html", "nosotros.html", "privacidad.html", "producto.html",
   "proximamente.html", "reclamaciones.html", "seccion.html", "terminos.html",
   "robots.txt", "sitemap.xml", "llms.txt", "_headers"
@@ -24,7 +24,12 @@ for (const file of rootFiles) {
 }
 
 await cp(path.join(root, "css"), path.join(output, "css"), { recursive: true });
-await cp(path.join(root, "js"), path.join(output, "js"), { recursive: true });
+await cp(path.join(root, "js"), path.join(output, "js"), {
+  recursive: true,
+  filter(source) {
+    return path.basename(source) !== "admin.js";
+  }
+});
 await cp(path.join(root, "assets"), path.join(output, "assets"), {
   recursive: true,
   filter(source) {

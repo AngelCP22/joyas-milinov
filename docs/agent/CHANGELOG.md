@@ -1,5 +1,13 @@
 # Engineering log
 
+## 2026-08-08 - Disable unfinished production admin
+
+- Agent: Codex
+- Objective: Make the unfinished inventory panel unavailable from the public deployment until its authentication and storage setup is completed.
+- Changes and files: Excluded `admin.html` and `js/admin.js` from `dist`, added both to the forbidden-artifact audit, removed public route references, and added an audited `supabase.enabled: false` kill switch.
+- Security decision: Keep the panel source in the private development workflow while publishing no executable admin route or client bundle.
+- Reactivation gate: Restore the two public artifacts only after Supabase Auth, RLS, Storage policies, administrator allowlisting, and production access tests pass.
+
 ## 2026-08-08 - Hero video framing and brand sizing
 
 - Agent: Codex

@@ -4,8 +4,7 @@
 
 User-agent: *
 Allow: /
-# El panel y los archivos internos no deben indexarse.
-Disallow: //admin
+# Los archivos internos no deben indexarse.
 Disallow: /backend/
 Disallow: /docs/
 Disallow: /assets/source-joyas/

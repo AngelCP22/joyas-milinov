@@ -8,8 +8,8 @@
  * Flujo de datos del catálogo:
  *   1. Se renderiza al instante con PRODUCTS (catálogo estático en products.js).
  *   2. En paralelo se consulta el backend local (config.js → apiUrl).
- *   3. Si responde, PRODUCTS se reemplaza con el inventario real (precios y
- *      stock actualizados desde /admin) y las vistas se vuelven a pintar.
+ *   3. Si responde, PRODUCTS se reemplaza con el inventario real y las vistas
+ *      se vuelven a pintar.
  *   4. Si no hay backend (hosting estático), el paso 2 falla en silencio.
  *
  * Depende de: config.js (esc, money, whatsappUrl), products.js, cart.js.
@@ -120,7 +120,7 @@ async function hydrateProductsFromApi() {
  */
 async function loadFromSupabase() {
   const cfg = (window.MILINOV && window.MILINOV.supabase) || {};
-  if (!cfg.url || !cfg.anonKey) return null;
+  if (!cfg.enabled || !cfg.url || !cfg.anonKey) return null;
 
   if (!window.supabase) {
     await new Promise((resolve, reject) => {

@@ -55,7 +55,7 @@ hydrateProductsFromApi()
 Mover la BD de Supabase a cualquier Postgres (Neon, Railway, RDS, VPS):
 1. `pg_dump` del proyecto actual → archivo `.sql`.
 2. Crear la BD nueva y `psql < archivo.sql` (o restaurar el dump). Datos intactos.
-3. En `js/config.js`, actualizar `supabase.url`/`anonKey` (o, si el proveedor no es
+3. En `js/config.js`, activar `supabase.enabled` y actualizar `supabase.url`/`anonKey` (o, si el proveedor no es
    Supabase, ajustar el adaptador `loadFromSupabase()` al nuevo cliente).
 4. Mover las fotos del bucket al nuevo almacenamiento y (si cambia el dominio de las
    URLs) actualizar las rutas con un `UPDATE`.

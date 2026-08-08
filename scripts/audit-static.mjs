@@ -19,6 +19,11 @@ async function walk(directory) {
 
 const files = await walk(output);
 const htmlFiles = files.filter(file => file.endsWith(".html"));
+const publicConfig = await readFile(path.join(output, "js", "config.js"), "utf8");
+
+if (/supabase\s*:\s*\{[\s\S]*?enabled\s*:\s*true/.test(publicConfig)) {
+  failures.push("La integración Supabase no debe activarse en esta publicación");
+}
 
 for (const htmlFile of htmlFiles) {
   const html = await readFile(htmlFile, "utf8");
@@ -51,7 +56,14 @@ for (const htmlFile of htmlFiles) {
   }
 }
 
-for (const forbidden of ["backend", "docs", path.join("assets", "source-joyas"), path.join("assets", "contact-sheet.jpg")]) {
+for (const forbidden of [
+  "admin.html",
+  path.join("js", "admin.js"),
+  "backend",
+  "docs",
+  path.join("assets", "source-joyas"),
+  path.join("assets", "contact-sheet.jpg")
+]) {
   try {
     await access(path.join(output, forbidden));
     failures.push(`Se publicó un recurso interno: ${forbidden}`);
