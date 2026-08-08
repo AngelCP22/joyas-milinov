@@ -2066,6 +2066,7 @@ h1, h2, h3 {
   height: 100%;
   border-radius: inherit;
   object-fit: cover;
+  object-position: 50% 43%;
 }
 
 .linktree-profile h1 {
