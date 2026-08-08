@@ -83,7 +83,7 @@ npm run build
 
 El resultado queda en `dist/` y excluye automáticamente `backend/`, documentación interna, fotos originales y scripts de desarrollo.
 
-**Producción:** Cloudflare Pages está conectado a este repositorio con `main` como rama, `npm run build` como comando y `dist` como directorio de salida. El dominio oficial es [www.milinovjoyeria.com](https://www.milinovjoyeria.com). **Vercel es una alternativa**, no un segundo paso.
+**Producción:** Cloudflare Pages compila este repositorio desde `main` con `npm run build` y publica `dist`. El dominio oficial es [www.milinovjoyeria.com](https://www.milinovjoyeria.com). Si un push no inicia un build, reautoriza el repositorio en la integración GitHub de Pages o dispara el despliegue desde el panel de Cloudflare. **Vercel es una alternativa**, no un segundo paso.
 
 GitHub Pages ya publica `dist/` mediante `.github/workflows/pages.yml`. Detalle completo en [docs/DOCUMENTACION.md](docs/DOCUMENTACION.md).
 
