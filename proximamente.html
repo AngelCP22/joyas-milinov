@@ -12,7 +12,7 @@
   <meta property="og:description" content="Algo hermoso está por brillar. Nuestra tienda abre el 17 de julio de 2026.">
   <meta property="og:image" content="https://www.milinovjoyeria.com/assets/banners/hero-collar.jpg">
   <meta property="og:locale" content="es_PE">
-  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/brand/milinov-mark.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap">
@@ -54,17 +54,8 @@
     }
     @keyframes rise { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
 
-    .brand { display: grid; justify-items: center; gap: 8px; color: var(--gold-dark); }
-    .brand .mark { font-size: 30px; line-height: 1; animation: spin 9s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .brand strong {
-      font-family: "Montserrat", sans-serif; font-weight: 400;
-      font-size: clamp(34px, 7vw, 56px); letter-spacing: .16em; text-transform: uppercase;
-    }
-    .brand small {
-      font-family: "Playfair Display", serif; letter-spacing: .55em;
-      padding-left: .55em; font-size: 13px; color: var(--muted);
-    }
+    .brand { display: block; width: min(260px, 66vw); line-height: 0; }
+    .brand img { display: block; width: 100%; height: auto; }
 
     .eyebrow {
       text-transform: uppercase; letter-spacing: .26em; font-size: 12px;
@@ -139,11 +130,9 @@
   <div class="sparkles" aria-hidden="true" id="sparkles"></div>
 
   <main class="shell" id="shell">
-    <div class="brand">
-      <span class="mark">✦</span>
-      <strong>Milinov</strong>
-      <small>JEWELRY</small>
-    </div>
+    <a class="brand" href="/" aria-label="Milinov Jewelry">
+      <img src="assets/brand/milinov-logo.png" alt="Milinov Jewelry">
+    </a>
 
     <span class="eyebrow">Muy pronto</span>
     <h1>Algo hermoso está por brillar</h1>
