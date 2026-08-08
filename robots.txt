@@ -1,5 +1,5 @@
 # Milinov Jewelry — robots.txt
-# Dominio oficial: https://angelcp22.github.io/joyas-milinov
+# Dominio oficial: https://www.milinovjoyeria.com
 # (si cambia, actualiza aquí, en sitemap.xml y en los <link rel="canonical"> del HTML).
 
 User-agent: *
@@ -10,4 +10,4 @@ Disallow: /backend/
 Disallow: /docs/
 Disallow: /assets/source-joyas/
 
-Sitemap: https://angelcp22.github.io/joyas-milinov/sitemap.xml
+Sitemap: https://www.milinovjoyeria.com/sitemap.xml

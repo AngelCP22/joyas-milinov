@@ -4,11 +4,11 @@ Milinov Jewelry es una tienda de joyas con sede en Lima, Perú. Ofrece collares,
 
 ## Páginas principales
 
-- Tienda: https://angelcp22.github.io/joyas-milinov/
-- Catálogo: https://angelcp22.github.io/joyas-milinov/catalogo.html
-- Contacto y preguntas frecuentes: https://angelcp22.github.io/joyas-milinov/contacto.html
-- Historia de la marca: https://angelcp22.github.io/joyas-milinov/nosotros.html
-- Políticas de compra: https://angelcp22.github.io/joyas-milinov/terminos.html
+- Tienda: https://www.milinovjoyeria.com/
+- Catálogo: https://www.milinovjoyeria.com/catalogo.html
+- Contacto y preguntas frecuentes: https://www.milinovjoyeria.com/contacto.html
+- Historia de la marca: https://www.milinovjoyeria.com/nosotros.html
+- Políticas de compra: https://www.milinovjoyeria.com/terminos.html
 
 ## Compra y atención
 

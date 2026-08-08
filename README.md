@@ -47,10 +47,10 @@ Abre <http://localhost:3001> — el mismo servidor sirve el sitio, el panel admi
 
 Todo se edita en [js/config.js](js/config.js):
 
-1. **Número de WhatsApp** (`whatsapp`) — formato internacional sin `+`, ej. `51987654321`. ⚠️ Hoy está el placeholder `51999999999`: **cámbialo o los botones de compra abren un chat a un número falso.** Ese único cambio actualiza todos los botones y enlaces del sitio.
+1. **Número de WhatsApp** (`whatsapp`) — formato internacional sin `+`, ej. `51987654321`. Ese único valor actualiza los botones y enlaces de compra del sitio.
 2. **Banner de promo** (`promo.text`) — escribe un texto y aparece la franja superior en todas las páginas (ej. campañas de Día de la Madre, San Valentín, Navidad). Déjalo en `""` para ocultarlo.
 3. **Analítica** (`analytics.ga4` / `analytics.metaPixel`) — pega los IDs de Google Analytics 4 y del Píxel de Meta cuando los tengas. Mientras estén vacíos el sitio funciona igual; cuando los pongas, empieza a medir visitas, agregados al carrito y clics a WhatsApp. Detalle en [docs/DOCUMENTACION.md](docs/DOCUMENTACION.md).
-4. **Dominio real** — al publicar, reemplaza `www.milinovjoyeria.com` por tu dominio en: [robots.txt](robots.txt), [sitemap.xml](sitemap.xml) y las etiquetas `<link rel="canonical">` / `og:` de cada HTML.
+4. **Dominio oficial** — producción usa `https://www.milinovjoyeria.com`; el dominio raíz también se conecta para que ambas variantes funcionen.
 5. **Correo y ciudad** — también en [js/config.js](js/config.js) y en los footers.
 
 ## Administrar productos (precios, stock, fotos)
@@ -83,7 +83,7 @@ npm run build
 
 El resultado queda en `dist/` y excluye automáticamente `backend/`, documentación interna, fotos originales y scripts de desarrollo.
 
-**Cloudflare Pages (recomendado):** conecta este repositorio, usa `main` como rama, `npm run build` como comando y `dist` como directorio de salida. **Vercel es una alternativa**, no un segundo paso: normalmente se elige Cloudflare Pages o Vercel para servir el mismo frontend.
+**Producción:** Cloudflare Pages está conectado a este repositorio con `main` como rama, `npm run build` como comando y `dist` como directorio de salida. El dominio oficial es [www.milinovjoyeria.com](https://www.milinovjoyeria.com). **Vercel es una alternativa**, no un segundo paso.
 
 GitHub Pages ya publica `dist/` mediante `.github/workflows/pages.yml`. Detalle completo en [docs/DOCUMENTACION.md](docs/DOCUMENTACION.md).
 
@@ -104,6 +104,6 @@ GitHub Pages ya publica `dist/` mediante `.github/workflows/pages.yml`. Detalle 
 ├── assets/                 ← imágenes (products/, banners/, uploads/)
 ├── backend/                ← API + servidor local (Node, sin dependencias)
 ├── scripts/                ← build y auditoría del paquete público
-├── robots.txt, sitemap.xml ← SEO (cambiar dominio al publicar)
+├── robots.txt, sitemap.xml ← SEO del dominio oficial
 └── docs/DOCUMENTACION.md   ← documentación técnica completa
 ```

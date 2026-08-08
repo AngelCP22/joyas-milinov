@@ -22,7 +22,7 @@ const htmlFiles = files.filter(file => file.endsWith(".html"));
 
 for (const htmlFile of htmlFiles) {
   const html = await readFile(htmlFile, "utf8");
-  if (/51999999999|www\.milinovjoyeria\.com/.test(html)) failures.push(`${htmlFile}: contiene datos provisionales`);
+  if (/51999999999/.test(html)) failures.push(`${htmlFile}: contiene datos provisionales`);
 
   for (const match of html.matchAll(/(?:href|src)="([^"]+)"/g)) {
     const value = match[1];

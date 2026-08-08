@@ -15,7 +15,7 @@ window.MILINOV = {
   brand: "Milinov Jewelry",
   email: "hola@milinovjoyeria.com",
   city: "Lima, Perú",
-  siteUrl: "https://angelcp22.github.io/joyas-milinov/",
+  siteUrl: "https://www.milinovjoyeria.com/",
 
   /**
    * Banner de promoción (franja superior). Editable sin tocar el resto del sitio.
