@@ -1005,7 +1005,7 @@ function injectWhatsappFab() {
   fab.target = "_blank";
   fab.rel = "noopener";
   fab.setAttribute("aria-label", "Escríbenos por WhatsApp");
-  fab.innerHTML = `<img src="assets/social/whatsapp.svg" alt="" aria-hidden="true">`;
+  fab.innerHTML = `<img src="assets/social/whatsapp-brand.svg" alt="" aria-hidden="true">`;
   document.body.appendChild(fab);
 
   const strip = qs(".whatsapp-strip");
