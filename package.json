@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "build": "node scripts/build-static.mjs",
-    "test": "node --test backend/test/server.test.js",
+    "test": "node --test backend/test/*.test.js",
     "audit": "node scripts/audit-static.mjs",
     "verify": "npm run build && npm run audit && npm test"
   }

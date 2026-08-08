@@ -6,7 +6,9 @@
  * medir automáticamente las visitas y los eventos clave del embudo:
  *   - view_item        → al abrir una ficha de producto
  *   - add_to_cart      → al agregar al carrito (cart.js)
- *   - initiate_checkout→ al enviar el pedido por WhatsApp (cart.js)
+ *   - view_cart        → al abrir un carrito con productos
+ *   - remove_from_cart → al retirar productos o unidades
+ *   - begin_checkout   → al iniciar pedido por WhatsApp, Yape o Plin
  *   - contact_whatsapp → al tocar cualquier enlace de WhatsApp (app.js)
  *
  * Expone window.trackEvent(nombre, params) que reenvía el evento a GA4 y a Meta.
@@ -68,7 +70,7 @@
   const META_EVENTS = {
     view_item: "ViewContent",
     add_to_cart: "AddToCart",
-    initiate_checkout: "InitiateCheckout",
+    begin_checkout: "InitiateCheckout",
     contact_whatsapp: "Contact"
   };
 

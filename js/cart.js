@@ -82,15 +82,17 @@ function addToCart(id, qty = 1) {
   }
 
   saveCart();
+  trackCommerceEvent("add_to_cart", [{ product, qty: newQty - currentQty }]);
   openCart();
   showToast(`${product.name} agregado al carrito`);
-
-  if (window.trackEvent) {
-    window.trackEvent("add_to_cart", { content_name: product.name, value: product.price, currency: "PEN" });
-  }
 }
 
-function removeFromCart(id) {
+function removeFromCart(id, options = {}) {
+  const item = cart.find(entry => entry.id === Number(id));
+  const product = item && findProduct(item.id);
+  if (options.track !== false && item && product) {
+    trackCommerceEvent("remove_from_cart", [{ product, qty: item.qty }]);
+  }
   cart = cart.filter(item => item.id !== Number(id));
   saveCart();
 }
@@ -102,7 +104,7 @@ function changeQty(id, delta) {
   const product = findProduct(id);
   // Si el producto ya no existe en el catálogo, se retira del carrito.
   if (!product) {
-    removeFromCart(id);
+    removeFromCart(id, { track: false });
     return;
   }
 
@@ -111,7 +113,7 @@ function changeQty(id, delta) {
   const stock = availableStock(product);
   if (stock <= 0) {
     showToast(`${product.name} quedó agotado y se quitó del carrito`);
-    removeFromCart(id);
+    removeFromCart(id, { track: false });
     return;
   }
 
@@ -122,12 +124,14 @@ function changeQty(id, delta) {
     return;
   }
 
-  item.qty = newQty;
-  if (item.qty <= 0) {
-    removeFromCart(id);
+  if (newQty <= 0) {
+    trackCommerceEvent("remove_from_cart", [{ product, qty: 1 }]);
+    removeFromCart(id, { track: false });
     return;
   }
+  item.qty = newQty;
   saveCart();
+  trackCommerceEvent(delta > 0 ? "add_to_cart" : "remove_from_cart", [{ product, qty: 1 }]);
 }
 
 function getCartTotal() {
@@ -139,6 +143,35 @@ function getCartTotal() {
 
 function getCartCount() {
   return cart.reduce((total, item) => total + item.qty, 0);
+}
+
+/** Construye un payload compatible con comercio electrónico de GA4 y Meta. */
+function commercePayload(entries = null) {
+  const source = entries || cart.map(item => ({ product: findProduct(item.id), qty: item.qty }));
+  const lines = source.filter(entry => entry.product && Number(entry.qty) > 0);
+  const items = lines.map(({ product, qty }) => ({
+    item_id: product.sku || `MIL-${product.id}`,
+    item_name: product.name,
+    item_brand: window.MILINOV.brand,
+    item_category: product.category,
+    item_variant: product.material,
+    price: Number(product.price),
+    quantity: Number(qty)
+  }));
+  return {
+    currency: "PEN",
+    value: lines.reduce((total, entry) => total + Number(entry.product.price) * Number(entry.qty), 0),
+    num_items: lines.reduce((total, entry) => total + Number(entry.qty), 0),
+    content_type: "product",
+    content_ids: items.map(item => item.item_id),
+    contents: items.map(item => ({ id: item.item_id, quantity: item.quantity, item_price: item.price })),
+    items
+  };
+}
+
+function trackCommerceEvent(name, entries = null, extra = {}) {
+  if (!window.trackEvent) return;
+  window.trackEvent(name, { ...commercePayload(entries), ...extra });
 }
 
 /** Código corto de pedido (para que la vendedora identifique cada chat). */
@@ -197,6 +230,7 @@ function whatsappSingleUrl(product, qty = 1) {
 function openCart() {
   closeMobileMenu();
   const drawer = document.querySelector(".cart-drawer");
+  const wasOpen = drawer?.classList.contains("is-open");
   drawer?.classList.add("is-open");
   drawer?.setAttribute("aria-hidden", "false");
   if (drawer) drawer.inert = false;
@@ -204,6 +238,7 @@ function openCart() {
   document.querySelector(".overlay")?.classList.add("is-open");
   document.body.classList.add("no-scroll");
   document.querySelector("[data-close-cart]")?.focus();
+  if (!wasOpen && cart.length) trackCommerceEvent("view_cart");
 }
 
 function closeCart() {
@@ -253,9 +288,9 @@ function updateCartUI() {
           <p>${esc(product.material)}</p>
           <div class="cart-item-row">
             <div class="qty-control">
-              <button type="button" aria-label="Quitar una unidad" onclick="changeQty(${product.id}, -1)">−</button>
+              <button type="button" aria-label="Quitar una unidad" data-cart-action="decrease" data-product-id="${product.id}">−</button>
               <span>${item.qty}</span>
-              <button type="button" aria-label="Agregar una unidad" onclick="changeQty(${product.id}, 1)">+</button>
+              <button type="button" aria-label="Agregar una unidad" data-cart-action="increase" data-product-id="${product.id}">+</button>
             </div>
             <div class="cart-item-price">
               <strong>${money(lineTotal)}</strong>
@@ -263,7 +298,7 @@ function updateCartUI() {
             </div>
           </div>
         </div>
-        <button class="remove-btn" type="button" aria-label="Eliminar ${esc(product.name)} del carrito" onclick="removeFromCart(${product.id})">×</button>
+        <button class="remove-btn" type="button" aria-label="Eliminar ${esc(product.name)} del carrito" data-cart-action="remove" data-product-id="${product.id}">×</button>
       </article>
     `;
   }).join("");
@@ -274,9 +309,7 @@ function checkoutWhatsapp() {
     showToast("Agrega productos antes de enviar el pedido");
     return;
   }
-  if (window.trackEvent) {
-    window.trackEvent("initiate_checkout", { value: getCartTotal(), currency: "PEN", num_items: getCartCount() });
-  }
+  trackCommerceEvent("begin_checkout", null, { checkout_method: "whatsapp" });
   const url = whatsappCartUrl();
   window.open(url, "_blank", "noopener");
   showOrderConfirm(url);
@@ -293,9 +326,7 @@ function checkoutOnline() {
     return;
   }
   const pay = (window.MILINOV && window.MILINOV.payments) || {};
-  if (window.trackEvent) {
-    window.trackEvent("initiate_checkout", { value: getCartTotal(), currency: "PEN", num_items: getCartCount(), method: "online" });
-  }
+  trackCommerceEvent("begin_checkout", null, { checkout_method: "online" });
   if (pay.checkoutUrl) {
     window.open(pay.checkoutUrl, "_blank", "noopener");
     showToast(`Abrimos el pago. Tu total es ${money(getCartTotal())}. Envíanos el comprobante por WhatsApp.`);
@@ -333,9 +364,7 @@ function checkoutWallet(kind) {
   if (!items || !meta) return;
   items.querySelector(".wallet-panel")?.remove();
 
-  if (window.trackEvent) {
-    window.trackEvent("initiate_checkout", { method: kind, value: getCartTotal(), currency: "PEN" });
-  }
+  trackCommerceEvent("begin_checkout", null, { checkout_method: kind });
 
   const qr = cfg.qr
     ? `<img class="wallet-qr" src="${esc(cfg.qr)}" alt="Código QR de ${esc(meta.label)}" loading="lazy" onerror="this.style.display='none'">`

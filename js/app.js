@@ -59,7 +59,7 @@ function productCard(product) {
         <p>${esc(product.description)}</p>
         <div class="product-footer">
           ${priceHtml(product)}
-          <button type="button" class="mini-cart-btn" onclick="addToCart(${Number(product.id)})" ${soldOut ? "disabled" : ""}>
+          <button type="button" class="mini-cart-btn" data-cart-action="add" data-product-id="${Number(product.id)}" ${soldOut ? "disabled" : ""}>
             ${soldOut ? "Agotado" : "Agregar"}
           </button>
         </div>
@@ -605,9 +605,7 @@ function initProductPage() {
   injectProductJsonLd(product);
   refreshIcons();
 
-  if (window.trackEvent) {
-    window.trackEvent("view_item", { content_name: product.name, value: product.price, currency: "PEN" });
-  }
+  trackCommerceEvent("view_item", [{ product, qty: 1 }]);
 }
 
 /**
@@ -863,6 +861,16 @@ function initUI() {
 
   qsa("[data-open-cart]").forEach(btn => btn.addEventListener("click", openCart));
   qsa("[data-close-cart]").forEach(btn => btn.addEventListener("click", closeCart));
+  document.addEventListener("click", event => {
+    const control = event.target.closest("[data-cart-action]");
+    if (!control) return;
+    const id = Number(control.dataset.productId);
+    if (!id) return;
+    if (control.dataset.cartAction === "add") addToCart(id);
+    if (control.dataset.cartAction === "increase") changeQty(id, 1);
+    if (control.dataset.cartAction === "decrease") changeQty(id, -1);
+    if (control.dataset.cartAction === "remove") removeFromCart(id);
+  });
   qs(".overlay")?.addEventListener("click", () => {
     closeCart();
     closeMobileMenu();
