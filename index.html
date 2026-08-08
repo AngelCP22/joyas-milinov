@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=brand3">
+  <link rel="stylesheet" href="css/styles.css?v=brand4">
   <!-- Precarga de la imagen principal del hero (mejora el LCP) -->
   <link rel="preload" as="image" href="assets/banners/hero-collar.webp" type="image/webp" fetchpriority="high">
   <!-- Datos estructurados de la tienda y sus perfiles oficiales. -->
@@ -94,10 +94,9 @@
 
   <main id="contenido">
     <section class="milinov-hero">
-      <picture>
-        <source type="image/webp" srcset="assets/banners/hero-collar.webp">
-        <img src="assets/banners/hero-collar.jpg" alt="Collar delicado Milinov" fetchpriority="high" decoding="async">
-      </picture>
+      <video class="hero-video" autoplay muted loop playsinline preload="metadata" poster="assets/banners/hero-collar.jpg" aria-hidden="true">
+        <source src="assets/video/milinov-presentacion.mp4" type="video/mp4">
+      </video>
       <div class="container hero-content">
         <span class="hero-kicker">Hecho para ti <i data-lucide="heart"></i></span>
         <h1>Nadie es como tú y ese es tu poder</h1>

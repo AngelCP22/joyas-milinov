@@ -1349,7 +1349,8 @@ h1, h2, h3 {
     linear-gradient(180deg, rgba(253, 243, 232, .28), rgba(253, 243, 232, .44));
 }
 
-.milinov-hero img {
+.milinov-hero img,
+.milinov-hero .hero-video {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -1864,8 +1865,9 @@ h1, h2, h3 {
     background: linear-gradient(90deg, rgba(255, 253, 248, .98), rgba(255, 250, 243, .62));
   }
 
-  .milinov-hero img {
-    object-position: 68% 50%;
+  .milinov-hero img,
+  .milinov-hero .hero-video {
+    object-position: 50% 45%;
   }
 
   .hero-content {
@@ -2082,24 +2084,6 @@ h1, h2, h3 {
   color: #4d423b;
   font-size: 16px;
   line-height: 1.55;
-}
-
-.linktree-video {
-  width: min(260px, 100%);
-  margin-top: 22px;
-  overflow: hidden;
-  border: 1px solid rgba(184, 143, 57, .32);
-  border-radius: 8px;
-  background: #211d1a;
-  box-shadow: 0 18px 38px rgba(82, 58, 43, .14);
-  line-height: 0;
-}
-
-.linktree-video video {
-  display: block;
-  width: 100%;
-  aspect-ratio: 9 / 16;
-  object-fit: cover;
 }
 
 .linktree-links {
