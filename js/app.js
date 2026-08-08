@@ -9,7 +9,7 @@
  *   1. Se renderiza al instante con PRODUCTS (catálogo estático en products.js).
  *   2. En paralelo se consulta el backend local (config.js → apiUrl).
  *   3. Si responde, PRODUCTS se reemplaza con el inventario real (precios y
- *      stock actualizados desde admin.html) y las vistas se vuelven a pintar.
+ *      stock actualizados desde /admin) y las vistas se vuelven a pintar.
  *   4. Si no hay backend (hosting estático), el paso 2 falla en silencio.
  *
  * Depende de: config.js (esc, money, whatsappUrl), products.js, cart.js.
@@ -48,14 +48,14 @@ function productCard(product) {
     : "";
   return `
     <article class="product-card${soldOut ? " is-sold-out" : ""}">
-      <a class="product-image" href="producto.html?id=${Number(product.id)}">
+      <a class="product-image" href="/producto?id=${Number(product.id)}">
         ${picture(product.image, { alt: product.name, onerror: "productImageFallback(event)" })}
         ${hoverImg}
         ${soldOut ? `<span class="sold-out-badge">Agotado</span>` : badgesHtml}
       </a>
       <div class="product-info">
         <span>${esc(product.collection)} · ${esc(product.material)}</span>
-        <h3><a href="producto.html?id=${Number(product.id)}">${esc(product.name)}</a></h3>
+        <h3><a href="/producto?id=${Number(product.id)}">${esc(product.name)}</a></h3>
         <p>${esc(product.description)}</p>
         <div class="product-footer">
           ${priceHtml(product)}
@@ -283,7 +283,7 @@ function initFeaturedSlider() {
 }
 
 /* ============================================================
-   Catálogo: filtros y orden (catalogo.html)
+   Catálogo: filtros y orden (/catalogo)
    ============================================================ */
 
 let catalogState = {
@@ -430,7 +430,7 @@ function clearCatalogFilters() {
 }
 
 /**
- * Página de sección (seccion.html?genero=Hombre|Mujer): muestra los 3 materiales
+ * Página de sección (/seccion?genero=Hombre|Mujer): muestra los 3 materiales
  * (Plata 950, Cobre + enchape oro 18k, Reloj). Plata y Oro despliegan las 4
  * categorías; Reloj enlaza directo a su catálogo.
  */
@@ -452,7 +452,7 @@ function initSeccion() {
   ];
 
   node.innerHTML = materiales.map(material => {
-    const base = `catalogo.html?gender=${encodeURIComponent(genero)}&material=${encodeURIComponent(material.name)}`;
+    const base = `/catalogo?gender=${encodeURIComponent(genero)}&material=${encodeURIComponent(material.name)}`;
     const sublinks = material.cats
       ? `<div class="seccion-cats">${material.cats.map(c => `<a href="${base}&category=${encodeURIComponent(c)}">${esc(c)}</a>`).join("")}<a class="seccion-all" href="${base}">Ver todo</a></div>`
       : `<div class="seccion-cats"><a class="seccion-all" href="${base}">Ver relojes</a></div>`;
@@ -470,7 +470,7 @@ function initSeccion() {
 }
 
 /* ============================================================
-   Detalle de producto (producto.html)
+   Detalle de producto (/producto)
    ============================================================ */
 
 function initProductPage() {
@@ -483,7 +483,7 @@ function initProductPage() {
   // Si vino ?id pero no corresponde a ningún producto, mostrar "no encontrado"
   // en vez de caer en silencio al primer producto del catálogo.
   if (idParam !== null && !findProduct(Number(idParam))) {
-    productSection.innerHTML = `<div class="no-results">No encontramos esta joya. <a href="catalogo.html">Ver el catálogo</a></div>`;
+    productSection.innerHTML = `<div class="no-results">No encontramos esta joya. <a href="/catalogo">Ver el catálogo</a></div>`;
     document.title = `Producto no encontrado | ${window.MILINOV.brand}`;
     return;
   }
@@ -659,7 +659,7 @@ function injectProductJsonLd(product) {
     name: product.name,
     description: product.description,
     image: (Array.isArray(product.images) && product.images.length ? product.images : [product.image]).map(absoluteSiteUrl),
-    url: absoluteSiteUrl(`producto.html?id=${Number(product.id)}`),
+    url: absoluteSiteUrl(`/producto?id=${Number(product.id)}`),
     sku: `MIL-${Number(product.id)}`,
     category: product.category,
     material: product.material,
@@ -668,7 +668,7 @@ function injectProductJsonLd(product) {
       "@type": "Offer",
       priceCurrency: "PEN",
       price: product.price,
-      url: absoluteSiteUrl(`producto.html?id=${Number(product.id)}`),
+      url: absoluteSiteUrl(`/producto?id=${Number(product.id)}`),
       itemCondition: "https://schema.org/NewCondition",
       availability: isSoldOut(product)
         ? "https://schema.org/OutOfStock"
@@ -679,7 +679,7 @@ function injectProductJsonLd(product) {
 }
 
 function updateProductMetadata(product) {
-  const url = absoluteSiteUrl(`producto.html?id=${Number(product.id)}`);
+  const url = absoluteSiteUrl(`/producto?id=${Number(product.id)}`);
   const image = absoluteSiteUrl(bestSrc(product.image));
   const description = `${product.name} en ${product.material}. ${product.description} Precio ${money(product.price)}.`;
   const setMeta = (selector, attribute, value) => {
@@ -703,7 +703,7 @@ function initSearchShortcut() {
   if (!input) return;
   input.addEventListener("keydown", event => {
     if (event.key === "Enter" && input.value.trim()) {
-      window.location.href = `catalogo.html?search=${encodeURIComponent(input.value.trim())}`;
+      window.location.href = `/catalogo?search=${encodeURIComponent(input.value.trim())}`;
     }
   });
 }
@@ -755,7 +755,7 @@ function initContactForm() {
 }
 
 /**
- * Libro de Reclamaciones (reclamaciones.html): valida y arma la hoja de
+ * Libro de Reclamaciones (/reclamaciones): valida y arma la hoja de
  * reclamación, y la envía por WhatsApp o correo (no hay backend en producción).
  */
 function initReclamoForm() {
@@ -830,7 +830,7 @@ function initCookieBanner() {
   bar.setAttribute("role", "dialog");
   bar.setAttribute("aria-label", "Aviso de cookies");
   bar.innerHTML = `
-    <p>Usamos cookies de analítica para mejorar la tienda. Puedes aceptarlas o rechazarlas. <a href="privacidad.html">Más información</a>.</p>
+    <p>Usamos cookies de analítica para mejorar la tienda. Puedes aceptarlas o rechazarlas. <a href="/privacidad">Más información</a>.</p>
     <div class="cookie-actions">
       <button type="button" class="btn btn-outline" id="cookieReject">Rechazar</button>
       <button type="button" class="btn btn-primary" id="cookieAccept">Aceptar</button>

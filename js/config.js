@@ -23,7 +23,7 @@ window.MILINOV = {
    */
   promo: {
     text: "",        // Ej: "Día de la Madre: 15% OFF en collares con el código MAMA"
-    href: ""         // Opcional, a dónde lleva al tocar el banner. Ej: "catalogo.html"
+    href: ""         // Opcional, a dónde lleva al tocar el banner. Ej: "/catalogo"
   },
 
   /**
@@ -73,7 +73,7 @@ window.MILINOV = {
   /**
    * Base de datos en línea (Supabase). Catálogo en vivo: si pones aquí la URL y
    * la clave pública de tu proyecto, la tienda lee los productos de Supabase y
-   * admin.html permite editarlos con login, sin republicar. Si están vacías, la
+   * /admin permite editarlos con login, sin republicar. Si están vacías, la
    * tienda usa el backend local / el catálogo estático, como hasta ahora.
    * La anon key es pública por diseño; la seguridad la dan las políticas RLS
    * (ver backend/supabase/schema.sql). NO pongas aquí la "service_role" key.

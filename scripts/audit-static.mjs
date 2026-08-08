@@ -29,9 +29,20 @@ for (const htmlFile of htmlFiles) {
     if (/^(?:https?:|mailto:|tel:|data:|#)/.test(value)) continue;
     const local = decodeURIComponent(value.split(/[?#]/)[0]);
     if (!local) continue;
-    const target = path.resolve(path.dirname(htmlFile), local);
-    try { await access(target); }
-    catch { failures.push(`${path.relative(output, htmlFile)}: falta ${value}`); }
+    const fromRoot = local.startsWith("/");
+    const cleanPath = fromRoot ? local.replace(/^\/+/, "") : local;
+    const base = fromRoot ? output : path.dirname(htmlFile);
+    const target = path.resolve(base, cleanPath);
+    const candidates = [target];
+    if (!path.extname(target)) {
+      candidates.push(`${target}.html`, path.join(target, "index.html"));
+    }
+    let found = false;
+    for (const candidate of candidates) {
+      try { await access(candidate); found = true; break; }
+      catch {}
+    }
+    if (!found) failures.push(`${path.relative(output, htmlFile)}: falta ${value}`);
   }
 
   for (const match of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {

@@ -5,10 +5,10 @@ Milinov Jewelry es una tienda de joyas con sede en Lima, Perú. Ofrece collares,
 ## Páginas principales
 
 - Tienda: https://www.milinovjoyeria.com/
-- Catálogo: https://www.milinovjoyeria.com/catalogo.html
-- Contacto y preguntas frecuentes: https://www.milinovjoyeria.com/contacto.html
-- Historia de la marca: https://www.milinovjoyeria.com/nosotros.html
-- Políticas de compra: https://www.milinovjoyeria.com/terminos.html
+- Catálogo: https://www.milinovjoyeria.com/catalogo
+- Contacto y preguntas frecuentes: https://www.milinovjoyeria.com/contacto
+- Historia de la marca: https://www.milinovjoyeria.com/nosotros
+- Políticas de compra: https://www.milinovjoyeria.com/terminos
 
 ## Compra y atención
 

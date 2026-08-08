@@ -233,7 +233,7 @@ function updateCartUI() {
     cartItems.innerHTML = `
       <div class="empty-cart">
         <p>Tu carrito está vacío.</p>
-        <a href="catalogo.html" class="btn btn-outline">Ver catálogo</a>
+        <a href="/catalogo" class="btn btn-outline">Ver catálogo</a>
       </div>
     `;
     return;
