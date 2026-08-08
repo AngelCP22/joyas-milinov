@@ -1,5 +1,13 @@
 # Engineering log
 
+## 2026-08-08 - Hero video framing and brand sizing
+
+- Agent: Codex
+- Objective: Integrate the supplied presentation video into the storefront hero without recompression and balance the official logo across breakpoints.
+- Changes and files: Adjusted the hero poster, video focal point, text-protection overlay, and responsive logo dimensions in `index.html` and `css/styles.css`.
+- Decisions: Preserve the original 1080x1920 MP4 byte-for-byte; use CSS cropping because the supplied source is portrait while the desktop hero is wide.
+- Validation: Static build, link audit, backend tests, and desktop/mobile browser checks.
+
 ## 2026-08-08 — Cloudflare production domain
 
 - Agent: Codex
