@@ -1751,16 +1751,20 @@ h1, h2, h3 {
   border-radius: 999px;
   display: grid;
   place-items: center;
+  padding: 7px;
+  background: rgba(37, 211, 102, .16);
+  transition: transform .2s ease, background-color .2s ease;
 }
 
 .whatsapp-action img {
-  width: 56px;
-  height: 56px;
+  width: 42px;
+  height: 42px;
   display: block;
 }
 
-.whatsapp-action {
-  background: transparent;
+.whatsapp-action:hover {
+  background: rgba(37, 211, 102, .23);
+  transform: translateY(-2px);
 }
 
 .whatsapp-strip > a:not(.whatsapp-action) {
@@ -3255,10 +3259,11 @@ textarea:focus-visible {
   width: 56px;
   height: 56px;
   border-radius: 999px;
-  background: transparent;
+  padding: 7px;
+  background: rgba(37, 211, 102, .16);
   display: grid;
   place-items: center;
-  box-shadow: none;
+  box-shadow: 0 10px 24px rgba(37, 211, 102, .22);
   transition: transform .2s ease, opacity .2s ease;
 }
 
@@ -3267,9 +3272,9 @@ textarea:focus-visible {
 }
 
 .wa-fab img {
-  width: 56px;
-  height: 56px;
-  filter: drop-shadow(0 10px 14px rgba(37, 211, 102, .32));
+  width: 42px;
+  height: 42px;
+  display: block;
 }
 
 .wa-fab.is-hidden {
@@ -3287,8 +3292,8 @@ textarea:focus-visible {
   }
 
   .wa-fab img {
-    width: 52px;
-    height: 52px;
+    width: 38px;
+    height: 38px;
   }
 }
 
