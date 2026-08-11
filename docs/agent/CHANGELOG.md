@@ -1,5 +1,12 @@
 # Engineering log
 
+## 2026-08-11 - Inventory admin implementation handoff
+
+- Agent: Codex
+- Objective: Provide the next agent with a complete, security-gated implementation contract for product photos, prices, stock and realtime storefront updates.
+- Changes and files: Added `HANDOFF-ADMIN-INVENTARIO.md` and linked it from continuity status, messages and handoffs.
+- Decision: Keep the production panel and Supabase connection disabled until the documented Auth, RLS, Storage, Realtime, adversarial testing and explicit approval gates pass.
+
 ## 2026-08-08 - Disable unfinished production admin
 
 - Agent: Codex

@@ -1,5 +1,16 @@
 # Handoffs
 
+## HANDOFF-20260811-ADMIN-INVENTORY
+
+- Source agent: Codex
+- Target agent: Next implementation agent
+- Objective: Complete the private Supabase inventory panel for photos, prices, stock and realtime storefront updates.
+- State: PLANNING; production activation is explicitly forbidden until the security and acceptance gates pass.
+- Detailed contract: `docs/agent/HANDOFF-ADMIN-INVENTARIO.md`.
+- Existing implementation: `admin.html`, `js/admin.js`, `js/app.js`, `backend/supabase/schema.sql`, `backend/supabase/seed.sql`.
+- Current safety state: `supabase.enabled: false`; `admin.html` and `js/admin.js` excluded from `dist`; production routes return 404.
+- Required next action: Audit current code/schema, claim files in STATUS, create a development Supabase project owned by the client, and implement through preview without changing the production gates.
+
 ## HANDOFF-20260808-001
 
 - Source agent: Codex
