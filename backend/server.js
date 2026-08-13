@@ -21,6 +21,13 @@ const http = require("http");
 const fs = require("fs/promises");
 const path = require("path");
 
+// Reglas de inventario compartidas con el panel (js/admin.js) y las pruebas:
+// una sola fuente de verdad, alineada con las constraints de supabase/migrations/.
+const {
+  detectImageType, isValidImagePath, normalizeProduct, validateProduct,
+  IMAGE_MIME_TO_EXT
+} = require("../js/inventory-rules.js");
+
 const PORT = Number(process.env.PORT || 3001);
 const DATA_FILE = path.join(__dirname, "data", "products.json");
 const UPLOAD_DIR = path.join(__dirname, "..", "assets", "uploads");
@@ -146,19 +153,6 @@ function parseBody(req) {
    Subida de imágenes
    ============================================================ */
 
-// Extensión REAL derivada del tipo MIME validado (no del nombre del cliente),
-// para que nadie pueda guardar un .svg/.html disfrazado de imagen.
-const MIME_TO_EXT = { "image/png": ".png", "image/jpeg": ".jpg", "image/jpg": ".jpg", "image/webp": ".webp" };
-
-/** Verifica los magic bytes del archivo y devuelve su tipo real, o null. */
-function detectImageType(buffer) {
-  if (buffer.length < 12) return null;
-  if (buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4e && buffer[3] === 0x47) return "image/png";
-  if (buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) return "image/jpeg";
-  if (buffer.toString("ascii", 0, 4) === "RIFF" && buffer.toString("ascii", 8, 12) === "WEBP") return "image/webp";
-  return null;
-}
-
 /**
  * Convierte el nombre original en un slug seguro y único. La extensión se pasa
  * ya validada (derivada del MIME). Se añade entropía para que dos subidas en el
@@ -197,96 +191,15 @@ async function saveUpload(input) {
   }
 
   await fs.mkdir(UPLOAD_DIR, { recursive: true });
-  const filename = safeFilename(input.filename, MIME_TO_EXT[realType]);
+  const filename = safeFilename(input.filename, `.${IMAGE_MIME_TO_EXT[realType]}`);
   await fs.writeFile(path.join(UPLOAD_DIR, filename), bytes);
   return `assets/uploads/${filename}`;
 }
 
 /* ============================================================
-   Validación de productos
+   Validación de productos: vive en js/inventory-rules.js (compartida
+   con el panel). Aquí solo quedan los helpers propios del servidor.
    ============================================================ */
-
-/** Convierte a número o devuelve null si no es un número válido (campo opcional). */
-function numOrNull(value, fallback = null) {
-  if (value === undefined) return fallback;
-  if (value === null || value === "") return null;
-  const n = Number(value);
-  return Number.isFinite(n) ? n : fallback;
-}
-
-/** Acepta solo rutas de imagen razonables: relativas a assets/ o URLs http(s) con extensión de imagen. */
-function isValidImagePath(value) {
-  if (typeof value !== "string") return false;
-  const v = value.trim();
-  if (!v || !/\.(jpe?g|png|webp|svg)$/i.test(v)) return false;
-  return v.startsWith("assets/") || /^https?:\/\//i.test(v);
-}
-
-function normalizeProduct(input, fallback = {}) {
-  const rawImages = Array.isArray(input.images)
-    ? input.images
-    : (Array.isArray(fallback.images) ? fallback.images : []);
-  // Solo se conservan rutas de imagen válidas (evita datos sucios o rutas fuera de assets/).
-  const images = rawImages.filter(isValidImagePath);
-  // La portada (image) es la primera válida de la galería.
-  const image = isValidImagePath(input.image) ? input.image.trim()
-    : (images[0] ?? (isValidImagePath(fallback.image) ? fallback.image : ""));
-  const gallery = image && !images.length ? [image] : images;
-
-  return {
-    ...fallback,
-    sku: input.sku ?? fallback.sku ?? "",
-    gender: input.gender ?? fallback.gender ?? "",
-    name: input.name ?? fallback.name ?? "",
-    category: input.category ?? fallback.category ?? "",
-    collection: input.collection ?? fallback.collection ?? "",
-    model: input.model ?? fallback.model ?? "",
-    material: input.material ?? fallback.material ?? "",
-    price: Number(input.price ?? fallback.price ?? 0),
-    oldPrice: numOrNull(input.oldPrice, fallback.oldPrice ?? null),
-    stock: Number(input.stock ?? fallback.stock ?? 0),
-    status: input.status ?? fallback.status ?? "active",
-    badge: input.badge ?? fallback.badge ?? "",
-    sizeMm: input.sizeMm ?? fallback.sizeMm ?? "",
-    weightG: numOrNull(input.weightG, fallback.weightG ?? null),
-    care: input.care ?? fallback.care ?? "",
-    warranty: input.warranty ?? fallback.warranty ?? "",
-    featured: input.featured !== undefined ? Boolean(input.featured) : Boolean(fallback.featured),
-    image,
-    images: gallery,
-    description: input.description ?? fallback.description ?? ""
-  };
-}
-
-/**
- * Valida un producto ya normalizado. Recibe la lista actual para comprobar que
- * el SKU sea único. 'model' NO es obligatorio (no se publica en la tienda;
- * exigirlo rompía la edición en línea de productos que no lo tienen).
- */
-function validateProduct(product, products = []) {
-  const missing = ["sku", "name", "category"].filter(field => !String(product[field] ?? "").trim());
-  if (missing.length) return `Campos requeridos: ${missing.join(", ")}`;
-  if (!["Hombre", "Mujer"].includes(product.gender)) return "Selecciona el género (Hombre o Mujer)";
-  if (String(product.name).length > 120) return "El nombre es demasiado largo (máximo 120 caracteres)";
-  if (String(product.description).length > 1000) return "La descripción es demasiado larga (máximo 1000 caracteres)";
-  if (!Number.isFinite(product.price) || product.price <= 0) return "El precio debe ser un número mayor que 0";
-  if (!Number.isInteger(product.stock) || product.stock < 0) return "El stock debe ser un entero mayor o igual a 0";
-  if (!["active", "draft", "sold_out"].includes(product.status)) return "Estado inválido";
-  if (product.oldPrice != null && (!Number.isFinite(product.oldPrice) || product.oldPrice <= product.price)) {
-    return "El precio anterior (oferta) debe ser mayor que el precio actual";
-  }
-  if (product.weightG != null && (!Number.isFinite(product.weightG) || product.weightG < 0)) {
-    return "El peso debe ser un número mayor o igual a 0";
-  }
-  if (product.status === "active" && (!Array.isArray(product.images) || !product.images.length)) {
-    return "Agrega al menos una imagen para publicar el producto (estado activo)";
-  }
-  const sku = String(product.sku).trim().toLowerCase();
-  if (products.some(p => p.id !== product.id && String(p.sku).trim().toLowerCase() === sku)) {
-    return `El SKU '${product.sku}' ya existe en otro producto`;
-  }
-  return null;
-}
 
 function getIdFromPath(pathname) {
   const match = pathname.match(/^\/api\/products\/(\d+)$/);

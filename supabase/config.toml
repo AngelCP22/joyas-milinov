@@ -1,0 +1,13 @@
+# Configuración del CLI de Supabase para joyas-milinov.
+# Es seguro versionar este archivo (no contiene secretos).
+#
+# Uso contra el proyecto hosted (no requiere Docker):
+#   npx supabase login
+#   npx supabase link --project-ref <REF_DEL_PROYECTO>
+#   npx supabase db push --include-seed        (primera vez, aplica seed)
+#   npx supabase db push                       (siguientes migraciones)
+project_id = "joyas-milinov"
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]

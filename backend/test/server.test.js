@@ -25,11 +25,18 @@ test("validateProduct acepta un producto válido", () => {
   assert.equal(validateProduct(baseInput(), []), null);
 });
 
-test("validateProduct exige sku, name y category (no model)", () => {
+test("validateProduct exige sku y name siempre", () => {
   assert.match(validateProduct(baseInput({ sku: "" }), []), /Campos requeridos/);
   assert.match(validateProduct(baseInput({ name: " " }), []), /Campos requeridos/);
-  // model vacío NO debe bloquear (no se publica en la tienda)
-  assert.equal(validateProduct(baseInput({ model: "" }), []), null);
+});
+
+test("validateProduct exige category/material/model solo al publicar (regla de la base)", () => {
+  // Publicado (active o sold_out) exige la ficha completa…
+  assert.match(validateProduct(baseInput({ model: "" }), []), /Para publicar/);
+  assert.match(validateProduct(baseInput({ category: "" }), []), /Para publicar/);
+  assert.match(validateProduct(baseInput({ material: "" }), []), /Para publicar/);
+  // …pero un borrador puede guardarse incompleto.
+  assert.equal(validateProduct(baseInput({ model: "", category: "", material: "", status: "draft" }), []), null);
 });
 
 test("validateProduct rechaza precio <= 0", () => {
@@ -54,8 +61,9 @@ test("validateProduct exige oldPrice mayor que el precio", () => {
   assert.equal(validateProduct(baseInput({ oldPrice: 150 }), []), null);
 });
 
-test("validateProduct exige al menos una imagen si está activo", () => {
-  assert.match(validateProduct(baseInput({ images: [] }), []), /imagen/i);
+test("validateProduct exige al menos una foto si está publicado", () => {
+  assert.match(validateProduct(baseInput({ images: [] }), []), /foto/i);
+  assert.match(validateProduct(baseInput({ images: [], status: "sold_out", stock: 0 }), []), /foto/i);
   // En borrador no se exige imagen
   assert.equal(validateProduct(baseInput({ images: [], status: "draft" }), []), null);
 });

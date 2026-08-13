@@ -107,7 +107,7 @@ Inicio (index.html)
 ### Mejoras (Fase 6): pago en línea, Supabase y animaciones
 
 - **Carrito con doble opción** (`config.js → payments`): con `payments.enabled:false` (por defecto) el carrito muestra solo *"Enviar pedido por WhatsApp"* (publicable). Con `enabled:true` aparecen **"Pagar en línea"** + **"Pedir por WhatsApp"** (`injectCheckoutOptions()` en `app.js`). "Pagar en línea" abre `payments.checkoutUrl` (enlace de Mercado Pago/Izipay/Yape — **sin backend**) y muestra el total para enviar el comprobante por WhatsApp (`checkoutOnline()` en `cart.js`). El pedido por WhatsApp funciona siempre.
-- **Catálogo y panel en línea con Supabase** (`config.js → supabase`): con `url` + clave pública, la tienda lee productos y `admin.html` usa Auth, Database, Storage y Realtime. Si está vacío, usa el backend local / catálogo estático. El SQL aplica RLS: lectura pública del catálogo y escritura solo para usuarios de `admin_users`. **Nunca** usar la `service_role` key en el frontend.
+- **Catálogo y panel en línea con Supabase** (actualizado 2026-08-11): el esquema canónico vive en `supabase/migrations/` y la configuración pública YA NO se pega a mano en `config.js` — la inyecta el build con el gate de activación (`MILINOV_ADMIN_GATE` + variables de entorno; ver `docs/DEPLOY-ADMIN.md`). Sin gate, la tienda usa el backend local / catálogo estático. RLS: lectura pública del catálogo publicado y escritura solo para cuentas de `admin_users`. **Nunca** poner una clave secreta del servidor en el frontend (el auditor del build lo bloquea).
 - **Animaciones** (`initAnimations()` en `app.js`): aparición suave al hacer scroll (clase `.reveal` + `IntersectionObserver`) en secciones, tarjetas y testimonios. Respeta `prefers-reduced-motion` (si está activo, no oculta nada).
 
 ---
@@ -209,7 +209,7 @@ Servidor HTTP nativo de Node, **sin dependencias**. Hace dos cosas:
 
 **Sincronizar la tienda pública con el admin** → en el panel pulsa "Exportar respaldo" → reemplaza el `js/products.js` descargado en tu hosting y sube las fotos nuevas de `assets/uploads/`. La portada pública mostrará lo mismo que el admin, sin backend en línea.
 
-**Publicar** → subir el frontend incluido `admin.html`; excluir `backend/`, `assets/source-joyas/` y `assets/contact-sheet.jpg`. Cambiar dominio en `robots.txt`, `sitemap.xml` y los `canonical`/`og:` de cada HTML. Verificar el número de WhatsApp real en `js/config.js`. Para la bio de Instagram, usa la URL de `enlaces.html`.
+**Publicar** → `npm run build` genera `dist/` sin el panel (hoy desactivado: `admin.html` y sus scripts solo entran con el gate aprobado, ver `docs/DEPLOY-ADMIN.md`); `backend/`, `supabase/`, `docs/`, `assets/source-joyas/` y `assets/contact-sheet.jpg` quedan siempre fuera. Cambiar dominio en `robots.txt`, `sitemap.xml` y los `canonical`/`og:` de cada HTML. Verificar el número de WhatsApp real en `js/config.js`. Para la bio de Instagram, usa la URL de `enlaces.html`.
 
 ---
 

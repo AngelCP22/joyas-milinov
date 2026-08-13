@@ -215,7 +215,8 @@ function buildWhatsappText(singleProduct = null, qty = 1) {
   lines.push(`Pedido ${orderCode()}`);
   if (name) lines.push(`Nombre: ${name}`);
   if (city) lines.push(`Distrito/ciudad: ${city}`);
-  lines.push("Quedo atenta/o para coordinar el pago y envío.");
+  // El carrito NO reserva unidades: la disponibilidad se confirma en el chat.
+  lines.push("Quedo atenta/o para confirmar disponibilidad, pago y envío.");
   return encodeURIComponent(lines.join("\n"));
 }
 

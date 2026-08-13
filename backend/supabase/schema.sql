@@ -1,3 +1,9 @@
+-- ⛔ REEMPLAZADO (2026-08-11): NO ejecutar este archivo.
+-- El esquema vigente vive en supabase/migrations/ (versionado con Supabase CLI)
+-- e incorpora trigger de updated_at/version, constraints de integridad,
+-- prefijo cerrado de Storage y Realtime por Broadcast. Ver supabase/README.md.
+-- Se conserva solo como referencia histórica del primer diseño.
+--
 -- Milinov Jewelry: inventario, administradores, fotos y tiempo real.
 -- Ejecutar en Supabase > SQL Editor antes de seed.sql.
 

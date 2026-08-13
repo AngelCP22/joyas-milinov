@@ -23,8 +23,9 @@
         <label>Correo<input name="email" type="email" autocomplete="username" required placeholder="tu@correo.com"></label>
         <label>Contraseña<input name="password" type="password" autocomplete="current-password" minlength="6" required placeholder="Tu contraseña"></label>
         <button class="btn btn-primary" type="submit">Ingresar al panel</button>
-        <p class="admin-auth-status" id="adminAuthStatus" role="status"></p>
+        <p class="admin-auth-status" id="adminAuthStatus" role="status" aria-live="polite"></p>
       </form>
+      <a class="admin-back-link" href="#" id="adminForgot">¿Olvidaste tu contraseña?</a>
       <a class="admin-back-link" href="/">Volver a la tienda</a>
     </section>
   </main>
@@ -36,6 +37,22 @@
       <h1>Conecta el inventario</h1>
       <p>Para guardar fotos, precios y stock en tiempo real necesitas conectar un proyecto de Supabase una sola vez.</p>
       <a class="btn btn-outline" href="https://supabase.com/dashboard/projects" target="_blank" rel="noopener">Abrir Supabase</a>
+      <a class="admin-back-link" href="/">Volver a la tienda</a>
+    </section>
+  </main>
+
+  <main class="admin-access" id="adminRecovery" hidden>
+    <section class="admin-login-card">
+      <a class="admin-brand-logo" href="/" aria-label="Milinov Jewelry"><img class="brand-logo-image" src="assets/brand/milinov-logo.png" alt="Milinov Jewelry"></a>
+      <span class="eyebrow">Recuperar acceso</span>
+      <h1>Crea una nueva contraseña</h1>
+      <p>Escribe tu nueva contraseña dos veces para confirmar el cambio.</p>
+      <form class="admin-login-form" id="adminRecoveryForm">
+        <label>Nueva contraseña<input name="newPassword" type="password" autocomplete="new-password" minlength="8" required placeholder="Mínimo 8 caracteres"></label>
+        <label>Repite la contraseña<input name="confirmPassword" type="password" autocomplete="new-password" minlength="8" required placeholder="La misma contraseña"></label>
+        <button class="btn btn-primary" type="submit">Guardar y entrar</button>
+        <p class="admin-auth-status" id="adminRecoveryStatus" role="status" aria-live="polite"></p>
+      </form>
       <a class="admin-back-link" href="/">Volver a la tienda</a>
     </section>
   </main>
@@ -86,6 +103,7 @@
     <section class="admin-workspace">
       <form class="admin-card admin-form" id="productForm" hidden>
         <input type="hidden" name="id">
+        <input type="hidden" name="version">
         <div class="admin-form-heading">
           <div>
             <span class="eyebrow" id="formEyebrow">Nuevo producto</span>
@@ -114,7 +132,7 @@
           </select>
         </label>
         <label>Colección<input name="collection" placeholder="Silver"></label>
-        <label>Modelo<input name="model" required placeholder="Luna"></label>
+        <label>Modelo <small>(obligatorio para publicar)</small><input name="model" placeholder="Luna"></label>
         <label>Material
           <select name="material">
             <option>Plata 950</option>
@@ -159,7 +177,7 @@
         <label>Cuidados <small>(opcional)</small><textarea name="care" placeholder="Evita perfumes y agua de mar. Guárdala seca."></textarea></label>
         <label>Descripción<textarea name="description" placeholder="Descripción breve para el catálogo"></textarea></label>
         <div class="admin-actions">
-          <button class="btn btn-primary" type="submit">Guardar producto</button>
+          <button class="btn btn-primary" type="submit" id="saveProduct">Guardar producto</button>
           <button class="btn btn-outline" type="button" id="clearForm">Limpiar campos</button>
           <button class="btn btn-quiet" type="button" id="cancelForm">Cancelar</button>
         </div>
@@ -234,8 +252,9 @@
     </section>
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7/dist/umd/supabase.min.js" defer></script>
+  <script src="js/vendor/supabase.min.js" defer></script>
   <script src="js/config.js" defer></script>
-  <script src="js/admin.js?v=admin4" defer></script>
+  <script src="js/inventory-rules.js" defer></script>
+  <script src="js/admin.js?v=admin5" defer></script>
 </body>
 </html>

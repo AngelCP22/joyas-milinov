@@ -55,7 +55,16 @@ Todo se edita en [js/config.js](js/config.js):
 
 ## Administrar productos (precios, stock, fotos)
 
-**En línea:** configura Supabase siguiendo [backend/supabase/README.md](backend/supabase/README.md). Después abre `admin.html`, inicia sesión y administra la tienda desde cualquier dispositivo. Los cambios se reflejan en el catálogo abierto sin republicar el sitio.
+**En línea (panel privado con Supabase):** el esquema versionado vive en
+[supabase/](supabase/README.md) (migraciones + seed generados y probados) y la
+activación en producción sigue el gate documentado en
+[docs/DEPLOY-ADMIN.md](docs/DEPLOY-ADMIN.md). **Hoy el panel está desactivado
+en producción** (no se publica y `supabase.enabled` es `false`); se enciende
+solo con la matriz de seguridad aprobada y la confirmación de la propietaria.
+Una vez activo: `admin.html` exige inicio de sesión, solo las cuentas de
+`admin_users` pueden escribir, y los cambios de fotos, precios y stock se
+reflejan en la tienda abierta sin republicar (aviso en tiempo real + sondeo de
+respaldo).
 
 **En local:** también se conserva el modo de desarrollo con Node:
 
@@ -71,7 +80,12 @@ El panel **gestiona todo** el inventario, pero la tienda principal está protegi
 
 **Para publicar sin backend** (hosting estático, lo más común): en el panel pulsa **"Exportar respaldo"** → descarga un `products.js` con todo tu inventario actual → reemplázalo en `js/products.js` y sube ese archivo junto con las fotos. Así la tienda pública queda idéntica a lo que ves en el admin, sin necesitar el backend en línea.
 
-> El `admin.html` publicado solo se habilita cuando Supabase está configurado y exige inicio de sesión. Nunca publiques claves secretas ni la clave `service_role`; el navegador usa únicamente la clave pública.
+> El `admin.html` publicado solo se habilita con el gate de activación
+> (`MILINOV_ADMIN_GATE`, ver [docs/DEPLOY-ADMIN.md](docs/DEPLOY-ADMIN.md)) y
+> exige inicio de sesión + autorización en `admin_users`. Nunca publiques
+> claves secretas (prefijo `sb_secret` o el rol de servicio antiguo); el
+> navegador usa únicamente la clave pública `sb_publishable_…` y el auditor
+> del build falla si detecta un secreto.
 
 ## Publicar el sitio (hosting estático)
 
@@ -98,12 +112,26 @@ GitHub Pages ya publica `dist/` mediante `.github/workflows/pages.yml`. Detalle 
 ├── js/
 │   ├── config.js           ← ⚙️ CONFIGURACIÓN (WhatsApp, marca, API)
 │   ├── products.js         ← catálogo estático de respaldo
+│   ├── inventory-rules.js  ← reglas de inventario compartidas (panel+backend+tests)
 │   ├── cart.js             ← carrito (localStorage) + checkout WhatsApp
-│   ├── app.js              ← render, filtros, slider, accesibilidad
-│   └── admin.js            ← lógica del panel admin
+│   ├── app.js              ← render, filtros, slider, tiempo real, accesibilidad
+│   ├── admin.js            ← lógica del panel admin
+│   └── vendor/             ← supabase-js servido por el propio sitio
 ├── assets/                 ← imágenes (products/, banners/, uploads/)
-├── backend/                ← API + servidor local (Node, sin dependencias)
-├── scripts/                ← build y auditoría del paquete público
+├── backend/                ← API + servidor local (Node) para desarrollo
+├── supabase/               ← migraciones versionadas + seed del inventario
+├── scripts/                ← build (con gate de activación), auditoría y seed
 ├── robots.txt, sitemap.xml ← SEO del dominio oficial
-└── docs/DOCUMENTACION.md   ← documentación técnica completa
+└── docs/                   ← DOCUMENTACION.md, DEPLOY-ADMIN.md, agent/
 ```
+
+## Pruebas
+
+```bash
+npm run verify   # build + auditoría + 63 pruebas
+```
+
+Incluye la matriz de permisos completa del panel ejecutada sobre las
+migraciones reales en Postgres embebido (PGlite, sin Docker): visitante,
+usuario autenticado no autorizado y administradora, más constraints,
+concurrencia optimista, Storage y el aviso de tiempo real.

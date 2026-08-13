@@ -5,6 +5,11 @@
     "build": "node scripts/build-static.mjs",
     "test": "node --test backend/test/*.test.js",
     "audit": "node scripts/audit-static.mjs",
+    "seed": "node scripts/generate-seed.mjs",
     "verify": "npm run build && npm run audit && npm test"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.4",
+    "@supabase/supabase-js": "2.110.7"
   }
 }

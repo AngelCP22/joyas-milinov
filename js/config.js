@@ -71,16 +71,24 @@ window.MILINOV = {
   },
 
   /**
-   * Integración de inventario en línea reservada para una fase posterior.
+   * Integración de inventario en línea (panel privado + tiempo real).
    * Mientras enabled sea false, el sitio no crea conexiones con Supabase,
    * incluso si se añadieran credenciales por error.
-   * La anon key es pública por diseño; la seguridad la dan las políticas RLS
-   * (ver backend/supabase/schema.sql). NO pongas aquí la "service_role" key.
+   *
+   * En producción este bloque lo escribe el build (scripts/build-static.mjs)
+   * desde variables de entorno de Cloudflare Pages, SOLO con el gate de
+   * activación aprobado (ver docs/DEPLOY-ADMIN.md). No editar a mano aquí.
+   *
+   * La publishable key (sb_publishable_…) es pública por diseño; la seguridad
+   * la dan los grants + políticas RLS (supabase/migrations/). PROHIBIDO poner
+   * aquí una clave secreta del servidor (las de prefijo "sb_secret" o el rol
+   * de servicio antiguo): el auditor del build falla si detecta una.
    */
   supabase: {
     enabled: false,
-    url: "",        // https://TUPROYECTO.supabase.co
-    anonKey: ""     // clave pública "publishable" o la antigua "anon"
+    url: "",            // https://TUPROYECTO.supabase.co
+    publishableKey: "", // sb_publishable_…
+    anonKey: ""         // compatibilidad con la clave "anon" legada; dejar vacío
   },
 
   /**

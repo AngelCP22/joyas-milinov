@@ -1,5 +1,11 @@
 # Inventario en línea con Supabase
 
+> ⛔ **REEMPLAZADO (2026-08-11).** La configuración vigente está en
+> [`supabase/`](../../supabase/README.md) (migraciones versionadas + seed
+> generado) y el procedimiento de activación en
+> [`docs/DEPLOY-ADMIN.md`](../../docs/DEPLOY-ADMIN.md). Esta carpeta queda solo
+> como referencia histórica; no ejecutar `schema.sql` ni `seed.sql` de aquí.
+
 Esta configuración activa `admin.html` como panel privado. Desde ahí se pueden
 crear joyas, subir fotos, editar precios y cambiar stock desde celular o PC. La
 tienda recibe los cambios en tiempo real. No requiere VPS.

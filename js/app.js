@@ -114,35 +114,44 @@ async function hydrateProductsFromApi() {
 
 /**
  * Lee el catálogo desde Supabase si hay credenciales en config.js. Carga el
- * cliente oficial desde CDN bajo demanda y mapea las columnas (snake_case de
- * Postgres) a las claves que usa la tienda. Devuelve null si no está configurado
- * o falla (entonces se usa el backend local / catálogo estático).
+ * cliente oficial (servido por el propio sitio) bajo demanda y mapea las
+ * columnas (snake_case de Postgres) a las claves que usa la tienda.
+ * Devuelve null si no está configurado o falla (entonces se usa el backend
+ * local / catálogo estático). Nunca reemplaza el catálogo con datos corruptos:
+ * las filas sin id/nombre/precio válidos se descartan.
  */
 async function loadFromSupabase() {
   const cfg = (window.MILINOV && window.MILINOV.supabase) || {};
-  if (!cfg.enabled || !cfg.url || !cfg.anonKey) return null;
+  const key = cfg.publishableKey || cfg.anonKey;
+  if (!cfg.enabled || !cfg.url || !key) return null;
 
   if (!window.supabase) {
+    // Con timeout y sin dejar el <script> fallido en el DOM: así un corte de
+    // red al inicio no impide reintentar en la siguiente lectura.
     await new Promise((resolve, reject) => {
       const script = document.createElement("script");
-      script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7/dist/umd/supabase.min.js";
-      script.onload = resolve;
-      script.onerror = reject;
+      script.src = "js/vendor/supabase.min.js";
+      const cleanup = () => { clearTimeout(timer); script.remove(); };
+      const timer = setTimeout(() => { cleanup(); reject(new Error("timeout")); }, 8000);
+      script.onload = () => { clearTimeout(timer); resolve(); };
+      script.onerror = () => { cleanup(); reject(new Error("no se pudo cargar supabase-js")); };
       document.head.appendChild(script);
     });
+    if (!window.supabase) throw new Error("supabase-js no disponible");
   }
 
   if (!catalogSupabaseClient) {
-    catalogSupabaseClient = window.supabase.createClient(cfg.url, cfg.anonKey);
+    catalogSupabaseClient = window.supabase.createClient(cfg.url, key);
   }
   const { data, error } = await catalogSupabaseClient.from("products")
     .select("*")
     .in("status", ["active", "sold_out"])
     .order("id");
-  if (error || !Array.isArray(data)) return null;
+  if (error || !Array.isArray(data) || !data.length) return null;
 
-  return data.map(row => ({
+  const mapped = data.map(row => ({
     id: row.id,
+    sku: row.sku,
     gender: row.gender,
     name: row.name,
     category: row.category,
@@ -161,29 +170,106 @@ async function loadFromSupabase() {
     care: row.care,
     warranty: row.warranty,
     featured: row.featured
-  }));
+  })).filter(p => Number(p.id) > 0 && p.name && Number.isFinite(p.price) && p.price > 0);
+
+  return mapped.length ? mapped : null;
 }
 
-/** Escucha cambios de inventario y repinta la tienda sin recargar la página. */
-function subscribeInventoryRealtime() {
-  if (!catalogSupabaseClient || inventoryRealtimeChannel) return;
-  let refreshTimer;
-  const refresh = () => {
-    clearTimeout(refreshTimer);
-    refreshTimer = setTimeout(async () => {
-      const updated = await loadFromSupabase();
-      if (!Array.isArray(updated)) return;
-      PRODUCTS.splice(0, PRODUCTS.length, ...updated);
-      refreshDynamicViews();
-    }, 180);
-  };
+/**
+ * Vuelve a consultar el catálogo y repinta (con desduplicado de ráfagas).
+ * El contador de secuencia descarta respuestas que llegan tarde: sin él, una
+ * consulta lenta lanzada ANTES podía pisar los datos de una posterior y dejar
+ * la tienda mostrando un precio o un stock viejo hasta el siguiente evento.
+ */
+let storeRefreshTimer;
+let storeRefreshSeq = 0;
+function refreshCatalogFromSupabase(delay = 180) {
+  clearTimeout(storeRefreshTimer);
+  storeRefreshTimer = setTimeout(async () => {
+    const seq = ++storeRefreshSeq;
+    const updated = await loadFromSupabase();
+    if (!Array.isArray(updated) || seq !== storeRefreshSeq) return;
+    PRODUCTS.splice(0, PRODUCTS.length, ...updated);
+    refreshDynamicViews();
+    // Si el cliente se creó recién (p. ej. el vendor falló al inicio y ahora
+    // sí cargó), conecta el canal: es idempotente si ya está conectado.
+    subscribeInventoryRealtime();
+  }, delay);
+}
 
-  inventoryRealtimeChannel = catalogSupabaseClient.channel("store-products-live")
-    .on("postgres_changes", { event: "*", schema: "public", table: "products" }, refresh)
-    .subscribe();
+/**
+ * Escucha el aviso de cambios del inventario (Broadcast, topic privado
+ * 'catalog': un ping sin datos que emite la base) y re-consulta el catálogo.
+ * El aviso no reemplaza la lectura de recuperación: también se refresca al
+ * volver a la pestaña, al recuperar conexión y con un sondeo lento si el
+ * canal queda caído.
+ */
+let storeRealtimeRetryTimer = null;
+let storeRealtimePollTimer = null;
+let storeRealtimeRetryDelay = 2000;
 
+/**
+ * Registra las lecturas de recuperación. Se llaman aunque el cliente de
+ * Supabase todavía no exista (p. ej. si el script del vendor falló al cargar):
+ * de lo contrario un único fallo de red al inicio dejaría la sesión clavada en
+ * el catálogo estático para siempre.
+ */
+function hookCatalogRecovery() {
+  if (hookCatalogRecovery.done) return;
+  hookCatalogRecovery.done = true;
   document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible") refresh();
+    if (document.visibilityState === "visible") refreshCatalogFromSupabase();
+  });
+  window.addEventListener("online", () => refreshCatalogFromSupabase());
+  // Red de seguridad mientras no haya canal conectado (incluye el caso
+  // "el vendor nunca cargó"): reintento lento hasta que algo funcione.
+  if (!storeRealtimePollTimer) {
+    storeRealtimePollTimer = setInterval(() => refreshCatalogFromSupabase(0), 60000);
+  }
+}
+
+/** Cierra el canal actual sin que su evento CLOSED se interprete como fallo. */
+async function teardownCatalogChannel() {
+  const channel = inventoryRealtimeChannel;
+  inventoryRealtimeChannel = null; // el callback del canal viejo ya no cuenta
+  if (channel) await catalogSupabaseClient.removeChannel(channel).catch(() => {});
+}
+
+function subscribeInventoryRealtime() {
+  hookCatalogRecovery();
+  if (!catalogSupabaseClient || inventoryRealtimeChannel) return;
+
+  catalogSupabaseClient.realtime.setAuth(); // autorización de canales privados
+  const channel = catalogSupabaseClient.channel("catalog", { config: { private: true } })
+    .on("broadcast", { event: "change" }, () => refreshCatalogFromSupabase());
+  inventoryRealtimeChannel = channel;
+
+  channel.subscribe(status => {
+    // Un canal ya reemplazado (o cerrado por nosotros) no debe programar nada:
+    // removeChannel() reinyecta CLOSED en este mismo callback y, sin este
+    // guardia, cada reintento generaba otro reintento en bucle infinito.
+    if (inventoryRealtimeChannel !== channel) return;
+
+    if (status === "SUBSCRIBED") {
+      storeRealtimeRetryDelay = 2000;
+      // Cancelar el reintento pendiente: si no, mataría este canal ya sano.
+      clearTimeout(storeRealtimeRetryTimer);
+      storeRealtimeRetryTimer = null;
+      clearInterval(storeRealtimePollTimer);
+      storeRealtimePollTimer = null;
+      refreshCatalogFromSupabase(); // ponerse al día tras (re)conectar
+      return;
+    }
+    if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
+      if (!storeRealtimePollTimer) storeRealtimePollTimer = setInterval(() => refreshCatalogFromSupabase(0), 60000);
+      clearTimeout(storeRealtimeRetryTimer);
+      storeRealtimeRetryTimer = setTimeout(async () => {
+        storeRealtimeRetryTimer = null;
+        await teardownCatalogChannel();
+        storeRealtimeRetryDelay = Math.min(storeRealtimeRetryDelay * 2, 30000);
+        subscribeInventoryRealtime();
+      }, storeRealtimeRetryDelay);
+    }
   });
 }
 
@@ -477,6 +563,13 @@ function initProductPage() {
   const productSection = qs("#productDetail");
   if (!productSection) return;
 
+  // Esta función también corre cuando llega un aviso de inventario, así que
+  // debe comportarse como un re-render: conservar lo que el cliente ya eligió
+  // (cantidad y foto abierta) y no volver a contar la visita en la analítica.
+  const isRerender = Boolean(qs("#mainProductImage"));
+  const previousQty = Math.max(1, Number(qs("#productQty")?.textContent) || 1);
+  const previousThumb = qs("#productDetail [data-thumb].is-active")?.dataset.thumb || null;
+
   const params = new URLSearchParams(window.location.search);
   const idParam = params.get("id");
 
@@ -576,10 +669,21 @@ function initProductPage() {
     });
   });
 
-  let qty = 1;
+  // Re-render: devolver la foto que el cliente estaba viendo, si sigue existiendo.
+  if (isRerender && previousThumb) {
+    const sameThumb = qsa("#productDetail [data-thumb]").find(b => b.dataset.thumb === previousThumb);
+    if (sameThumb) {
+      qs("#mainProductImage").src = previousThumb;
+      qsa("#productDetail [data-thumb]").forEach(b => b.classList.toggle("is-active", b === sameThumb));
+    }
+  }
+
   const available = availableStock(product);
   const stockLimit = Number.isFinite(available) ? Math.max(1, Math.min(99, available)) : 99;
+  // Conservar la cantidad elegida (acotada al stock vigente, que pudo bajar).
+  let qty = isRerender ? Math.min(previousQty, stockLimit) : 1;
   const qtyNode = qs("#productQty");
+  qtyNode.textContent = qty;
   qs("#productMinus").addEventListener("click", () => {
     qty = Math.max(1, qty - 1);
     qtyNode.textContent = qty;
@@ -605,7 +709,9 @@ function initProductPage() {
   injectProductJsonLd(product);
   refreshIcons();
 
-  trackCommerceEvent("view_item", [{ product, qty: 1 }]);
+  // Solo la primera pintada cuenta como visita: un aviso de inventario no debe
+  // inflar la analítica con un view_item por cada edición del panel.
+  if (!isRerender) trackCommerceEvent("view_item", [{ product, qty: 1 }]);
 }
 
 /**
@@ -658,7 +764,7 @@ function injectProductJsonLd(product) {
     description: product.description,
     image: (Array.isArray(product.images) && product.images.length ? product.images : [product.image]).map(absoluteSiteUrl),
     url: absoluteSiteUrl(`/producto?id=${Number(product.id)}`),
-    sku: `MIL-${Number(product.id)}`,
+    sku: product.sku || `MIL-${Number(product.id)}`,
     category: product.category,
     material: product.material,
     brand: { "@type": "Brand", name: window.MILINOV.brand },

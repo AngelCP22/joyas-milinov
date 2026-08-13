@@ -5,8 +5,8 @@ Guía de traspaso para retomar este proyecto sin contexto previo. Léela complet
 > **Estado al día (jun 2026) y rumbo decidido con la dueña:**
 > - **Top-bar unificado**: una sola franja crema premium en TODAS las páginas (antes el inicio era crema y las internas negras). Fuente única en la base `.top-bar` de `css/styles.css`.
 > - **Pagos = Yape y Plin (MVP, IMPLEMENTADO)**: en el carrito botones "Pagar con Yape" y "Pagar con Plin" (colores de marca) → panel con titular, número, QR opcional y total → "enviar comprobante por WhatsApp". Flujo genérico `checkoutWallet(kind)` en cart.js; config en `config.js → payments.yape` / `payments.plin` (poner números reales). Sin backend ni cuenta de comercio; confirmación manual del voucher. Automatizar (agregador Izipay/Culqi + webhook en Edge Function) es fase futura. Tarjeta vía enlace: `payments.checkoutUrl` (opcional, botón "Pagar con tarjeta").
-> - **Admin en tiempo real terminado**: `admin.html` ya usa Supabase Auth + Database + Storage, permite fotos drag&drop, precio y stock, y protege escritura con una lista de administradores. Falta pegar la URL + clave pública del proyecto real en `js/config.js` y ejecutar el SQL.
-> - **Automático** = los cambios se reflejan incluso en pestañas abiertas mediante Supabase Realtime; también se refresca al volver a la pestaña.
+> - **Admin en tiempo real IMPLEMENTADO Y PROBADO, PRODUCCIÓN DESACTIVADA (ago 2026)**: el esquema canónico está en `supabase/migrations/` (⛔ `backend/supabase/schema.sql` quedó obsoleto, no ejecutarlo). Ya NO se pegan credenciales a mano en `js/config.js`: la activación es un gate del build (`MILINOV_ADMIN_GATE=on` + variables de entorno en Cloudflare Pages). Procedimiento completo, matriz de seguridad de preview y rollback: `docs/DEPLOY-ADMIN.md`. No activar nada sin la aprobación explícita de la dueña.
+> - **Automático** = los cambios se reflejan incluso en pestañas abiertas mediante un aviso Broadcast de Supabase (ping sin datos) + refetch al volver a la pestaña/reconectar + sondeo de respaldo.
 
 ---
 
@@ -19,10 +19,19 @@ Tienda web de **Milinov Jewelry**: joyería peruana (Plata 950 y cobre con encha
 - **Ubicación:** `E:\CODEX\joyas-milinov`.
 - **Docs largas:** [README.md](README.md) (inicio rápido) y [docs/DOCUMENTACION.md](docs/DOCUMENTACION.md) (arquitectura completa). **Léelas**; aquí va solo lo esencial + las trampas.
 
-## 2. Restricción clave del entorno
+## 2. Entorno de esta máquina (actualizado 2026-08-11)
 
-- **Node.js NO está instalado en esta máquina.** No puedes ejecutar el backend ni `npm test` aquí. Verifica el JS del backend por **sintaxis** (`new Function(code)` vía el navegador de preview) y la lógica por lectura. El backend es correcto y está cubierto por tests (`backend/test/`), pero solo el usuario podrá correrlos donde tenga Node.
-- **Python sí está** (con Pillow + WebP) — se usa para servir el sitio en preview y para generar WebP.
+- **Node.js 24 SÍ está instalado**: corre `npm run verify` (build + auditoría +
+  55 tests, incluida la matriz de permisos sobre las migraciones reales con
+  Postgres embebido/PGlite — sin Docker). Ejecútalo antes y después de tocar
+  cualquier cosa del panel/build.
+- **Supabase CLI y Docker NO están.** Las migraciones se prueban con PGlite en
+  `npm test`; contra el proyecto real se aplican con `npx supabase` (ver
+  `supabase/README.md`).
+- **Python sí está** (con Pillow + WebP) — sirve para el preview estático y
+  para generar WebP.
+- ⚠️ Los tests E2E en modo local MUTAN `backend/data/products.json` y
+  regeneran `js/products.js`: restáuralos con git si solo estabas probando.
 
 ## 3. Cómo verlo / verificar cambios
 
@@ -135,7 +144,7 @@ ANTES DE PUBLICAR (no bloquean en desarrollo):
 
 ## 8. Reglas y trampas
 
-- **Publicar** `admin.html` y `js/admin.js`. **No publicar** la carpeta `backend/`, `assets/source-joyas/` ni `assets/contact-sheet.jpg`. La seguridad del panel depende de Auth + RLS, no de ocultar la URL.
+- **El panel NO se publica hoy**: `admin.html`, `js/admin.js`, `js/inventory-rules.js` y `js/vendor/` solo entran a `dist/` con el gate de activación aprobado (`MILINOV_ADMIN_GATE`, ver `docs/DEPLOY-ADMIN.md`); el auditor del build lo verifica en ambos modos. **No publicar jamás** `backend/`, `supabase/`, `docs/`, `assets/source-joyas/` ni `assets/contact-sheet.jpg`. La seguridad del panel depende de Auth + RLS, no de ocultar la URL.
 - **SÍ publicar** los archivos de hosting `_headers` (Cloudflare Pages/Netlify) y/o `vercel.json` (Vercel) — aplican CSP y cabeceras de seguridad en producción (en hosting estático no corre `server.js`, así que sin estos archivos el sitio iría sin cabeceras).
 - El backend **no tiene autenticación** (uso local); por eso escucha solo en `127.0.0.1`. Si alguna vez se expone, primero agregar token/HTTPS/CORS restringido/rate-limiting.
 - **Sobre SOLID:** se aplica DRY/SRP pragmático. NO meter clases/DI/bundler — sería sobre-ingeniería para este tamaño (ya documentado y decidido).
